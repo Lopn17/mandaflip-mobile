@@ -1,0 +1,2998 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>MandaFlip Mobile | stev_hgsn</title>
+<meta name="description" content="Belajar dan menghafal kosakata Mandarin (Hanzi, Pinyin, Arti) dengan flashcards. Data tersimpan di browser.">
+<link rel="icon" type="image/x-icon" href="https://i.ibb.co.com/ycPKf9v0/logo.png">
+<style>
+:root{ --bg:#0f1220;--panel:#151a2d;--muted:#9aa4bf;--text:#e8ecff;--accent:#7c9cff;--accent-2:#63e6be;--danger:#ff6b6b;--warn:#ffd43b; --card:#1b223a;--border:#2a355a;--shadow: 0 10px 30px rgba(0,0,0,.35); --radius:18px; }
+*{box-sizing:border-box}
+html,body{height:100%;margin: 0;padding: 0;}
+body{margin:0;background:linear-gradient(180deg,#0a0d1a,#0f1220);color:var(--text);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Noto Sans",sans-serif;}
+.container{max-width:1100px;margin-inline:auto;padding:12px}
+header {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 16px;
+    padding: 8px 0;
+}
+
+header h1 {
+    font-size: 1.6rem;
+    margin: 0;
+    text-align: center;
+    line-height: 1.2;
+}
+/* Nav */
+.nav {
+    display: flex;
+    gap: 8px;
+    min-width: max-content;
+    padding: 4px 0;
+}
+.nav .tab{
+    appearance: none;
+    border: 1px solid var(--border);
+    background: linear-gradient(180deg, #1b223a, #151a2d);
+    color: var(--text);
+    padding:10px 17px;
+    border-radius: 10px;
+    cursor: pointer;
+    box-shadow: var(--shadow);
+    font-size: 18px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+}
+.tab {
+    appearance: none;
+    border: 1px solid var(--border);
+    background: linear-gradient(180deg, #1b223a, #151a2d);
+    color: var(--text);
+    padding:8px 12px;
+    border-radius: 10px;
+    cursor: pointer;
+    box-shadow: var(--shadow);
+    font-size: 14px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+}
+.tab.active{background:linear-gradient(180deg,#5b7cff,#7c9cff);color:#0b1020;border-color:transparent}
+.tab:hover{transform: translateY(-2px);border-color: var(--accent);box-shadow: 0 8px 25px rgba(255, 110, 199, 0.2);}
+.panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    box-shadow: var(--shadow);
+    margin-top: 12px;
+}
+
+.panel h2 {
+    margin: 0 0 16px;
+    font-size: 1.2rem;
+    color: var(--text);
+    text-align: center;
+}
+
+option{color: #0a0d1a;}
+/* Manage */
+.form {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+}
+.form-row { display: flex; flex-direction: column; gap: 4px; }
+.form label { font-size: 0.9rem; color: var(--muted); font-weight: 500; }
+.form input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: var(--card);
+    color: var(--text);
+    font-size: 16px;
+}
+.form button { margin-top: 8px; padding: 12px; }
+
+.toolbar {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 16px 0;
+}
+.search input {background: var(--card);border: 1px solid var(--border);color: var(--text);padding: 10px 15px;border-radius: 12px;box-shadow: var(--shadow);font-size: 16px;font-family: inherit;transition: border-color 0.3s ease;}
+.search input:focus {outline: none;border-color: var(--accent);}
+.search input::placeholder {color: var(--muted);}
+.search{flex:1;display:flex;gap:8px}
+.search input{flex:1}
+.count{font-size:.9rem;color:var(--muted)}
+.table-wrapper {
+    max-height: 50vh;
+    overflow: auto;
+    overflow-anchor: none;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+}
+table{width:100%;border-collapse:separate;border-spacing:0 8px}
+th,td{padding:10px 12px;text-align:left}
+th{color:var(--muted);font-weight:600}
+tr{background:var(--card);border:1px solid var(--border)}
+tr td:first-child,tr th:first-child{border-top-left-radius:12px;border-bottom-left-radius:12px}
+tr td:last-child,tr th:last-child{border-top-right-radius:12px;border-bottom-right-radius:12px}
+/* Study */
+.study{display:flex;flex-direction:column;gap:12px}
+.card{position:relative;perspective: 1000px;height:320px; position: relative;}
+.card-inner {position: absolute;inset:0;border-radius: 22px;border: 1px solid var(--border);background: var(--card); /* Ubah ke --card agar bisa diwarnai */display: flex;align-items: center;justify-content: center;box-shadow: var(--shadow);transform-style: preserve-3d;transition: transform 0.5s, background 0.3s, border-color 0.3s;}
+.card-inner.is-again {background: linear-gradient(180deg, #5c2020, #4c1a1a);border-color: var(--danger);}
+.nav-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    color: var(--text);
+    font-size: 2.5rem;
+    cursor: pointer;
+    padding-left: 25px;
+    padding-right: 25px;
+    padding-top: 20%;
+    padding-bottom: 20%;
+    opacity: 0;
+    transition: opacity 0.2s ease, background-color 0.2s ease;
+    z-index: 10;
+}
+
+.nav-arrow:hover {
+    opacity: 1;
+}
+
+.nav-arrow.left {
+    left: 0;
+}
+
+.nav-arrow.right {
+    right: 0;
+}
+
+.mid {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: transparent;
+    border: none;
+    color: var(--text);
+    font-size: 2.5rem;
+    cursor: pointer;
+    padding-left: 35px;
+    padding-right: 35px;
+    padding-top: 20%;
+    padding-bottom: 20%;
+    transition: opacity 0.2s ease, background-color 0.2s ease;
+    z-index: 10;
+    opacity: 0;
+}
+
+.speak-btn{
+    appearance: none;
+    border: 1px solid var(--border);
+    background: linear-gradient(180deg, #1b223a, #151a2d);
+    color: var(--text);
+    padding:8px 12px;
+    border-radius: 10px;
+    cursor: pointer;
+    box-shadow: var(--shadow);
+    font-size: 14px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+    position: absolute;
+    top: 89%;
+    transform: translateY(-50%);
+    /* background: transparent; */
+    border: none;
+    /* box-shadow: none; */
+    font-size: 1.4rem;
+    cursor: pointer;
+    right: 2%;
+    transition: opacity 0.2s ease, background-color 0.2s ease;
+    z-index: 11;
+}
+
+.center {
+    position: absolute;
+    top: 70%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: transparent;
+    border: none;
+    color: var(--text);
+    font-size: 2.5rem;
+    cursor: pointer;
+    padding-left: 35px;
+    padding-right: 35px;
+    padding-top: 40%;
+    padding-bottom: 40%;
+    transition: opacity 0.2s ease, background-color 0.2s ease;
+    z-index: 10;
+    opacity: 0; 
+    pointer-events: none;
+    transition: opacity 0.5s ease-in-out, transform 0.5s ease;
+}
+
+.center.again {
+  color: #ff0000;
+  /* Webkit-specific property for a direct outline */
+  -webkit-text-stroke: 2px #000;
+  /* Universal fallback using text-shadow */
+  text-shadow: 
+    -1px -1px 0 #000, 
+     1px -1px 0 #000, 
+    -1px 1px 0 #000, 
+     1px 1px 0 #000;
+}
+
+
+.center.good {
+  color: #00b3ff;
+  /* Webkit-specific property for a direct outline */
+  -webkit-text-stroke: 2px #000000;
+  /* Universal fallback using text-shadow */
+  text-shadow: 
+    -1px -1px 0 #000, 
+     1px -1px 0 #000, 
+    -1px 1px 0 #000, 
+     1px 1px 0 #000;
+}
+
+.center.show {
+    opacity: 1; /* Tampilkan */
+    transform: translate(-50%, -50%) scale(1.1); /* Sedikit membesar saat muncul */
+}
+
+.center.again.show {
+    /* Atur posisi dan warna saat muncul */
+    color: #ff0000;
+    transform: translate(-50%, -50%) rotate(-10deg) scale(1.1); /* Sedikit miring ke kiri */
+}
+
+.center.good.show {
+    /* Atur posisi dan warna saat muncul */
+    color: #00b3ff;
+    transform: translate(-50%, -50%) rotate(10deg) scale(1.1); /* Sedikit miring ke kanan */
+}
+
+/* Study Controls (Mobile) */
+.study-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.nav-controls, .action-controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+}
+.settings-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+}
+.toggle-row { display: flex; justify-content: space-between; align-items: center; }
+
+/* Animasi tambahan */
+@keyframes reds {0%, 100% { box-shadow: 0 0 5px rgba(145, 0, 0, 0.5); }50% { box-shadow: 0 0 20px rgba(255, 110, 110, 0.8); }}
+.card-inner.is-again:hover {animation: reds 2s ease-in-out infinite;}
+.card-inner.is-good {background: linear-gradient(180deg, #243672, #213167);border-color: cyan;}
+@keyframes blues {0%, 100% { box-shadow: 0 0 5px rgba(0, 56, 145, 0.5); }50% { box-shadow: 0 0 20px rgba(110, 166, 255, 0.8); }}
+.card-inner.is-good:hover {animation: blues 2s ease-in-out infinite;}
+.card.flipped .card-inner{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;backface-visibility:hidden;padding:24px}
+.front{font-size:clamp(2.4rem,6vw,3.4rem);font-weight:700}
+.back{transform:rotateY(180deg);text-align:center}
+.pinyin,.arti,.hanzi-back{font-size:clamp(1.1rem,2.5vw,1.3rem);color:var(--muted)}
+.arti{font-size:clamp(1.5rem,2.6vw,1.4rem);color: white;margin-top:8px;}
+.pinyin,.hanzi-back{font-size:clamp(1.1rem,2.5vw,1.3rem)}
+.card-wrapper {position: absolute;inset: 0;transition: transform 0.3s ease-out;overflow-anchor: none;}
+.progress{height:10px;background:#0e1330;border-radius:999px;border:1px solid var(--border);overflow:hidden}
+.progress > div{height:100%;transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);background:linear-gradient(90deg,var(--accent),var(--accent-2));width:0}
+/* Quiz */
+.quiz{display:flex;flex-direction:column;gap:12px}
+.quiz-settings {
+    display:grid;
+    grid-template-columns:1fr;
+    gap:12px;
+}
+@media (min-width: 480px) {
+    .quiz-settings {
+        grid-template-columns:1fr 1fr;
+    }
+}
+
+.quiz-setting {
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+}
+
+.quiz-setting label {
+    font-size:0.9rem;
+    color:var(--muted);
+}
+
+.quiz-setting option{color: white;}
+.quiz-setting select,
+.quiz-setting input {
+    padding:10px;
+    border-radius:8px;
+    border:1px solid var(--border);
+    background:var(--card);
+    color:var(--text);
+    font-size:14px;
+}
+
+.q-stem{font-size:1.4rem}
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:700px){.choices{grid-template-columns:1fr}}
+.choice{padding:12px;border-radius:12px;color:white;background:var(--card);border:1px solid var(--border);cursor:pointer}
+.choice.correct{outline:2px solid var(--accent-2)}
+.choice.wrong{outline:2px solid var(--danger)}
+.transparent{opacity: 0;pointer-events: none;}
+/* Custom Modal */
+.modal-overlay {position: fixed;top: 0;left: 0;width: 100%;height: 100%;background-color: rgba(0, 0, 0, 0.7);display: flex;align-items: center;justify-content: center;z-index: 1000;backdrop-filter: blur(5px);}
+.modal-content {background: var(--panel);border: 1px solid var(--border);border-radius: var(--radius);box-shadow: var(--shadow);padding: 24px;max-width: 450px;width: 90%;display: flex;flex-direction: column;gap: 16px;animation: fadeIn 0.3s ease-in-out;}
+.modal-header {display: flex;justify-content: space-between;align-items: center;}
+.modal-header h3 {margin: 0;font-size: 1.2rem;color: var(--text);}
+.modal-body {font-size: 1rem;color: var(--muted);}
+.modal-footer {display: flex;justify-content: flex-end;gap: 8px;}
+#modalInput {padding: 10px 12px;border: 1px solid var(--border);border-radius: var(--radius);background-color: var(--input-background);color: var(--text);font-size: 1rem;width: 100%;box-sizing: border-box;transition: border-color 0.2s ease-in-out;}
+#modalInput:focus {outline: none;border-color: var(--primary);box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.2);}
+.close-btn {background: transparent;border: none;color: var(--muted);font-size: 1.8rem;cursor: pointer;line-height: 1;padding: 0;}
+.close-btn:hover {color: var(--danger);}
+.hidden {display: none !important;}
+@keyframes fadeIn {from { opacity: 0; transform: translateY(-20px);}to { opacity: 1; transform: translateY(0); }}
+.wm{user-select: none;color: rgba(255, 255, 255, 0.416);}
+/* Custom Toggle Switch */
+.toggle-switch {position: relative;display: inline-block;width: 40px;height: 24px;}
+.toggle-switch input {opacity: 0;width: 0;height: 0;}
+.toggle-slider {position: absolute;cursor: pointer;top: 0;left: 0;right: 0;bottom: 0;background-color: var(--card);border: 1px solid var(--border);transition: .4s;border-radius: 24px;}
+.toggle-slider:before {position: absolute;content: "";height: 16px;width: 16px;left: 4px;bottom: 3px;background-color: var(--muted);transition: .4s;border-radius: 50%;}
+input:checked + .toggle-slider {background-color: var(--accent);border-color: var(--accent-2);}
+input:checked + .toggle-slider:before {transform: translateX(16px);background-color: var(--text);}
+/* Custom scrollbar */
+::-webkit-scrollbar {width: 8px;}
+::-webkit-scrollbar-track {background: var(--bg);}
+::-webkit-scrollbar-thumb {background: linear-gradient(135deg, var(--accent), var(--accent-2));border-radius: 4px;}
+::-webkit-scrollbar-thumb:hover {background: var(--accent);}
+/* Etc */
+.description-text {
+  font-style: italic;
+  color: var(--muted);
+  font-size: 0.9em;
+  margin-top: -5px;
+}
+/* Container untuk judul dan tombol mata */
+.account-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+/* Tombol mata yang baru */
+.eye-button {
+    font-size: 1rem;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: var(--text-muted);
+    transition: color 0.2s ease-in-out;
+}
+
+.eye-button:hover {
+    color: var(--text);
+}
+
+@media (min-width: 768px) {
+    body { font-size: 16px; }
+    .container { padding: 12px; }
+    header { flex-direction: row; justify-content: space-between; align-items: center; }
+    header h1 { text-align: left; font-size: 1.8rem; }
+    .nav-wrapper { overflow: visible; }
+    .nav { flex-wrap: wrap; }
+    .panel h2 { text-align: left; }
+    .card { height: 350px; position: relative;}
+    
+    .study-controls { flex-direction: row; justify-content: space-between; align-items: center; }
+    .nav-controls { display: flex; grid-template-columns: auto; }
+    .action-controls { display: flex; grid-template-columns: auto; }
+    .settings-controls { flex-direction: row; padding: 8px 12px; }
+
+    .form { grid-template-columns: repeat(3, 1fr) auto; align-items: end; }
+    .form-row { flex-direction: row; align-items: center; gap: 8px; }
+    .form button { margin-top: 0; }
+
+    .toolbar { flex-direction: row; }
+    .quiz-settings { grid-template-columns: repeat(4, auto); align-items: end; }
+    .profile-container { flex-direction: row; text-align: left; align-items: flex-start; }
+    #accountButtons { justify-content: flex-start; }
+    .rank-container { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+}
+
+.main-container {
+    font-family: 'Poppins', sans-serif;
+    color: #e0e0e0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.containerz {
+    width: 100%;
+    max-width: 900px;
+    padding: 20px;
+    border-radius: 12px;
+    text-align: center;
+}
+
+.header {
+    color: #ffffff;
+    font-size: 2.5em;
+    margin-bottom: 20px;
+}
+
+.user-level-section {
+    margin-bottom: 30px;
+}
+
+.level-input {
+    padding: 10px 15px;
+    border-radius: 8px;
+    border: 2px solid #333;
+    background-color: #2b2b2b;
+    color: #ffffff;
+    font-size: 1.2em;
+    text-align: center;
+    width: 150px;
+}
+
+.level-input:focus {
+    outline: none;
+    border-color: #6a6aff;
+}
+
+.level-input::-webkit-outer-spin-button,
+.level-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.rank-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 20px;
+    justify-content: center;
+    padding: 0;
+}
+
+.tier-card {
+    padding: 24px;
+    border-radius: 12px;
+    border: 2px solid transparent;
+    text-align: center;
+    transition: all 0.3s ease-in-out;
+    opacity: 0.4;
+    transform: scale(0.95);
+    position: relative;
+    overflow: hidden;
+    background-size: 200% 200%;
+    background-position: center;
+    filter: grayscale(100%);
+}
+
+/* Active Rank Styles */
+.tier-card.active {
+    opacity: 1;
+    transform: scale(1);
+    filter: grayscale(0%);
+    border-color: #ffffff;
+}
+
+.tier-card.active .rank-name {
+    animation: text-shine 1.5s infinite alternate;
+}
+
+.tier-card.active::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+        45deg,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 0.2) 50%,
+        rgba(255, 255, 255, 0) 100%
+    );
+    animation: shine-effect 3s infinite linear;
+}
+
+/* Keyframes for shine effect */
+@keyframes shine-effect {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes text-shine {
+    0% {
+        text-shadow: 0 0 5px #fff, 0 0 10px #fff;
+    }
+    100% {
+        text-shadow: 0 0 10px #fff, 0 0 20px #fff;
+    }
+}
+
+/* Specific Rank Styles */
+.bronze { background-color: #6a3a14; border-color: #cd7f32; }
+.silver { background-color: #616161; border-color: #c0c0c0; }
+.gold { background-color: #927514; border-color: #ffd700; }
+.crystal { background-color: #004f70; border-color: #00cfff; }
+.platinum { background-color: #555c65; border-color: #e5e4e2; }
+.sapphire { background-color: #0f2d6b; border-color: #4169e1; }
+.diamond { background-color: #1e63a8; border-color: #b9f2ff; }
+.obsidian { background-color: #0b0b0b; border-color: #4b4b4b; }
+.titanium { background-color: #2f4f4f; border-color: #a9a9a9; }
+.mythic { background-color: #2c003e; border-color: #9932cc; }
+.master { background-color: #520092; border-color: #8a2be2; }
+.immortal { background-color: #222222; border-color: #ff69b4; }
+.phoenix { background-color: #8b0000; border-color: #ff6347; }
+.griffin { background-color: #3a3a52; border-color: #7b68ee; }
+.celestial { background-color: #191970; border-color: #87cefa; }
+.dragon { background-color: #990000; border-color: #ff0000; }
+.legend { background-color: #ff4500; border-color: #ffa500; }
+.eternal { background-color: #2d0033; border-color: #dda0dd; }
+.amethyst { background-color: #800080; border-color: #da70d6; }
+.cosmic { background-color: #0d1b2a; border-color: #00ffff; }
+.monarch { background-color: #0d0d2b; border-color: #4b0082; }
+.stellar { background-color: #3b5998; border-color: #6a85b6; }
+.radiant { background-color: #f7b733; border-color: #fc4a1a; }
+.divine { background-color: #f8c3e8; border-color: #fff982; }
+.aether { background-color: #b0c4de; border-color: #e6e6fa; }
+.zenith { background-color: #4f0340; border-color: #b33951; }
+.absolute { background-color: #000000; border-color: #ffffff; }
+
+.tier-icon {
+    font-size: 3em;
+    margin-bottom: 8px;
+    transition: transform 0.3s;
+}
+
+.tier-card.active .tier-icon {
+    transform: scale(1.2);
+    animation: icon-pulse 2s infinite;
+}
+
+@keyframes icon-pulse {
+    0% { transform: scale(1.2); }
+    50% { transform: scale(1.3); }
+    100% { transform: scale(1.2); }
+}
+
+.rank-name {
+    font-size: 1.5em;
+    font-weight: 600;
+    margin-bottom: 4px;
+    color: #fff;
+}
+
+
+.level {
+    font-size: 1em;
+    color: #ccc;
+}
+
+@media (max-width: 600px) {
+    .containerz {
+        padding: 15px;
+    }
+
+    .header {
+        font-size: 2em;
+    }
+
+    .rank-container {
+        grid-template-columns: 1fr;
+    }
+}
+
+.nav-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+.nav-wrapper::-webkit-scrollbar { display: none; }
+
+.mode-tabs, .filter-tabs {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 10px;
+    scrollbar-width: none;
+}
+.mode-tabs::-webkit-scrollbar, .filter-tabs::-webkit-scrollbar { display: none; }
+
+</style>
+</head>
+<body>
+<div class="container">
+<span class="wm">© stev_hgsn.</span>
+<header>
+<h1>MandaFlip <span style="color:var(--accent)">· Flashcard</span></h1>
+<div class="nav-wrapper">
+    <nav class="nav">
+        <button class="nav tab active" data-view="studyView">Belajar</button>
+        <button class="nav tab" data-view="quizView">Kuis</button>
+        <button class="nav tab" data-view="manageView">Kelola</button>
+        <button class="nav tab" data-view="accountView">Akun</button>
+    </nav>
+</div>
+</header>
+<section id="studyView" class="panel">
+    <h2>Mode Belajar (Flip)</h2>
+    <div class="mode-tabs">
+            <button class="tab active" data-mode="hanzi" id="modeHanziBtn">Tipe 1 (Hanzi)</button>
+            <button class="tab" data-mode="pinyin" id="modePinyinBtn">Tipe 2 (Pinyin)</button>
+            <button class="tab" data-mode="arti" id="modeArtiBtn">Tipe 3 (Arti)</button>
+    </div>
+    
+    <div class="filter-tabs" id="filter-group">
+        <button class="tab active" data-filter="all">Semua</button>
+        <button class="tab" data-filter="again">Again</button>
+        <button class="tab" data-filter="default">Belum Coba</button>
+        <button class="tab" data-filter="good">Good</button>
+    </div>
+
+    <div class="study">
+        <div class="card" id="studyCard">
+            <button class="nav-arrow left" id="prevNav">◀</button>
+            <button class="nav-arrow right" id="nextNav">▶</button>
+            <button class="mid" id="flipNav">⭕</button>
+            <button id="speakBtn" class="speak-btn">🔊</button>
+            <h1 class="center again">Again</h1>
+            <h1 class="center good">Good</h1>
+            <div class="card-wrapper">
+                <div class="card-inner">
+                    <div class="face front" id="frontText">—</div>
+                    <div class="face back">
+                        <div>
+                            <div class="pinyin" id="backPinyin">—</div>
+                            <div class="arti" id="backArti">—</div>
+                            <div class="hanzi-back" id="backHanzi" style="font-size:clamp(1.4rem,3vw,1.8rem);margin-top:8px">—</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="study-controls">
+            <div class="nav-controls">
+                <button id="prevBtn" class="tab">◀ Sebelumnya</button>
+                <button id="flipBtn" class="tab">Flip</button>
+                <button id="nextBtn" class="tab">Berikutnya ▶</button>
+            </div>
+            <div class="action-controls">  
+                <button id="againBtn" class="tab">Again (A)</button>
+                <button id="goodBtn" class="tab">Good (G)</button>
+                <button id="clearStatusBtn" class="tab" style="background:linear-gradient(180deg,#8d4b29,#683a21);">Clear</button>
+            </div>
+            <div>
+                <div style="text-align:center;margin-bottom:5px;color:var(--muted);font-size:.95rem">
+                    <span>Again: Swipe Left | Good: Swipe Right</span>
+                </div>
+                <div class="progress" title="Progres sesi ini">
+                    <div id="progressBar"></div>
+                </div>
+                <div style="text-align:center;margin-top:6px;color:var(--muted);font-size:.95rem">
+                    <span id="studyMeta">0/0</span> · <span id="todayStats">Good: 0 · Again: 0</span>
+                </div>
+            </div>
+            <div class="settings-controls">
+                <div class="toggle-row">
+                    <span style="font-size:.9rem;color:var(--muted)">Animasi</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="animationToggle" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                <div class="toggle-row" id="slideDurationWrapper">
+                    <label for="slideDurationInput" style="font-size:.9rem;color:var(--muted)">Durasi Slide (ms)</label>
+                    <input id="slideDurationInput" type="number" min="100" max="1000" value="300" style="width:100px;padding:8px;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--text)">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<section id="quizView" class="panel hidden">
+    <h2>Kuis Pilihan Ganda</h2>
+    <div class="quiz">
+        <div class="quiz-settings">
+            <div class="quiz-setting">
+                <label for="modeSel">Tipe Soal</label>
+                <select id="modeSel" class="tab">
+                    <option value="hanzi-arti">Hanzi → Arti</option>
+                    <option value="hanzi-pinyin">Hanzi → Pinyin</option>
+                    <option value="arti-hanzi">Arti → Hanzi</option>
+                    <option value="arti-pinyin">Arti → Pinyin</option>
+                    <option value="pinyin-arti">Pinyin → Arti</option>
+                    <option value="pinyin-hanzi">Pinyin → Hanzi</option>
+                    <option value="sound-hanzi">Sound → Hanzi</option>
+                    <option value="hanzi-sound">Hanzi → Sound</option>
+                    <option value="sound-arti">Sound → Arti</option>
+                    <option value="arti-sound">Arti → Sound</option>
+                </select>
+            </div>
+            <div class="quiz-setting">
+                <label for="numSel">Jumlah Soal</label>
+                <select id="numSel" class="tab">
+                    <option>5</option><option>10</option><option>15</option><option>20</option><option>25</option><option>50</option><option>100</option><option>150</option><option>300</option>
+                    <option value="custom">Kustom...</option>
+                </select>
+            </div>
+            <div class="quiz-setting" id="customNumWrap" style="display:none">
+                <label style="font-size:.9rem;color:var(--muted)">Masukkan jumlah</label><br>
+                <input id="customNum" type="number" min="1" placeholder="e.g. 12" style="width:90px;padding:8px;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--text)">
+            </div>
+            <div class="quiz-setting">
+                <label for="cChoices">Pilihan</label>
+                <select id="cChoices" class="tab">
+                    <option>2</option>
+                    <option>4</option>
+                    <option>6</option>
+                    <option>8</option>
+                    <option>10</option>
+                    <option>16</option>
+                    <option>20</option>
+                    <option>30</option>
+                    <option>40</option>
+                    <option>50</option>
+                    <option>80</option>
+                    <option>100</option>
+                    <option>150</option>
+                </select>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;">
+                <button id="startQuizBtn" class="tab">Mulai Kuis</button>
+                <div style="color:var(--muted);font-size:.9rem;">
+                    Skor: <span id="quizScore">0</span> / <span id="quizTotal">0</span> · <span id="quizGrade"></span>% · <span id="xpGain">0</span> xp
+                </div>
+            </div>
+        </div>
+        <div id="quizBox" class="panel" style="margin:0;display:none">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+        <div id="qNumber" style="font-size:0.9rem;color:var(--muted);margin-bottom:8px"></div>
+        <div id="quizStats" style="font-size:0.9rem;color:var(--muted);margin-bottom:8px">Benar: 0 · Salah: 0 · 0% · 0xp</div>
+        </div>
+        <div class="q-stem" id="qStem">—</div>
+        <div class="table-wrapper" style="margin-top: 10px;">
+            <div class="choices" id="qChoices"></div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:8px">
+        <button id="prevQBtn" class="tab" style="padding-left:40px;padding-right:40px;"  disabled>◀</button>
+        <button id="nextQBtn" class="tab" style="padding-left:40px;padding-right:40px;" >▶</button>
+        <button id="endQuizBtn" class="tab" style="padding-left:22px; padding-right:22px;">Akhiri</button>
+        </div>
+        <div id="quizFeedback" style="color:var(--muted);margin-top:6px"></div>
+        </div>
+    </div>
+</section>
+<section id="manageView" class="panel hidden">
+    <h2>Kelola Kartu</h2>
+    <form id="cardForm" class="form" autocomplete="off">
+        <div class="form-row">
+            <label>Hanzi</label>
+            <input id="hanzi" required placeholder="学习" />
+        </div>
+        <div class="form-row">
+            <label>Pinyin</label>
+            <input id="pinyin" required placeholder="xuéxí" />
+        </div>
+        <div class="form-row">
+            <label>Arti</label>
+            <input id="arti" required placeholder="belajar" />
+        </div>
+        <button class="tab" type="submit">Simpan</button>
+        <input type="hidden" id="editingId" />
+    </form>
+
+    <div class="toolbar">
+        <div class="search">
+            <input id="search" placeholder="Cari hanzi/pinyin/arti..."/>
+            <button id="shuffleBtn" class="tab">Acak</button>
+        </div>
+        <div class="count"><span id="totalCount">0</span> kartu</div>
+    </div>
+
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr><th>Hanzi</th><th>Pinyin</th><th>Arti</th><th>Aksi</th></tr>
+            </thead>
+            <tbody id="list"></tbody>
+        </table>
+    </div>
+
+    <div class="form">
+        <button id="exportBtn" class="tab">Export JSON</button>
+        <label class="tab" style="cursor:pointer">Import Kartu<input id="importInput" type="file" accept="application/json" hidden></label>
+        <button id="clearBtn" class="tab" title="Hapus semua data">Reset Kartu</button>
+    </div>
+
+</section>
+
+<section id="accountView" class="panel hidden">
+    <div class="account-header" style="position: relative;">
+        <h2>Detail Akun</h2>
+        <button id="hideButtonsBtn" class="tab eye-button">👁️</button>
+    </div>
+    
+    <div style="display:flex;flex-direction:column;gap:20px;margin-bottom:20px; margin-top: -30px;">
+        <div style="display:flex;align-items:center;gap:20px;">
+            <img id="userPfp" src="https://placehold.co/100x100/cccccc/000000?text=👤" alt="Profil Pengguna" style="width:100px;height:100px;border-radius:50%;border:2px solid var(--accent);object-fit:cover;">
+            <div>
+                <div class="profile-info">
+                    <div class="user-details">
+                        <h2 id="accountUsername" style="color: white;font-size: x-large;text-align: left;">--</h2>
+                        <p id="accountDescription" class="description-text">...</p>
+                    </div>
+                </div>
+                <p style="margin:4px 0;color:var(--muted);">Level: <span id="accountLevel">0</span></p>
+                <p style="margin:4px 0;color:var(--muted);">XP: [ <b><span id="accountXP">0</span></b> ] <i><span id="accountNextLevelXP">0</span></i></p>
+                <p style="margin:4px 0;color:var(--muted);">Peringkat: <span id="accountRank">—</span></p>
+            </div>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:12px;" id="accountButtons">
+            <button id="changeUsernameBtn" class="tab">Ubah Nama Pengguna</button>
+            <button id="changeDescriptionBtn" class="tab small-btn">Edit Deskripsi</button>
+            <button id="changePfpBtn" class="tab">Ubah Avatar</button>
+            <button class="tab" data-view="ranksView">Ranks</button>
+            <button id="exportAccountBtn" class="tab">Export Akun</button>
+            <label class="tab" style="cursor:pointer">Import Akun <input id="importAccountInput" type="file" accept="application/json" hidden></label>
+            <button id="resetAccountBtn" class="tab" style="background:linear-gradient(180deg,#8d4b29,#683a21);">Reset Akun</button>
+        </div>
+
+    <h3 style="margin-top: -10px;">Statistik Global</h3>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));gap:12px;margin-top: -20px;">
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;box-shadow:var(--shadow);">
+            <h4 style="margin:0 0 8px;color:var(--muted);font-size:0.9rem;">Kartu Dipelajari</h4>
+            <p id="statsCardsStudied" style="font-size:1.8rem;font-weight:700;margin:0;">0</p>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;box-shadow:var(--shadow);">
+            <h4 style="margin:0 0 8px;color:var(--muted);font-size:0.9rem;">Jawaban Benar (Good)</h4>
+            <p id="statsGoodAnswers" style="font-size:1.8rem;font-weight:700;margin:0;">0</p>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;box-shadow:var(--shadow);">
+            <h4 style="margin:0 0 8px;color:var(--muted);font-size:0.9rem;">Jawaban Ulang (Again)</h4>
+            <p id="statsAgainAnswers" style="font-size:1.8rem;font-weight:700;margin:0;">0</p>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;box-shadow:var(--shadow);">
+            <h4 style="margin:0 0 8px;color:var(--muted);font-size:0.9rem;">Total Kuis</h4>
+            <p id="statsTotalQuizzes" style="font-size:1.8rem;font-weight:700;margin:0;">0</p>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;box-shadow:var(--shadow);">
+            <h4 style="margin:0 0 8px;color:var(--muted);font-size:0.9rem;">Jawaban Benar Kuis</h4>
+            <p id="statsCorrectAnswers" style="font-size:1.8rem;font-weight:700;margin:0;">0</p>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;box-shadow:var(--shadow);">
+            <h4 style="margin:0 0 8px;color:var(--muted);font-size:0.9rem;">Jawaban Salah Kuis</h4>
+            <p id="statsWrongAnswers" style="font-size:1.8rem;font-weight:700;margin:0;">0</p>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;box-shadow:var(--shadow);">
+            <h4 style="margin:0 0 8px;color:var(--muted);font-size:0.9rem;">Akurasi Kuis</h4>
+            <p id="statsAccuracy" style="font-size:1.8rem;font-weight:700;margin:0;">0%</p>
+        </div>
+    </div>
+</section>
+<section id="ranksView" class="panel hidden">
+    <div class="main-container">
+        <div class="containerz">
+            <h1 class="header">Rank List</h1>
+            <div class="user-level-section">
+                <label for="user-level">Level Anda:</label>
+                <b><h1 id="usersLevel"></h1></b>
+                <input type="number" id="user-level" class="level-input hidden" value="1" min="1" max="100">
+            </div>
+            <div id="rank-container" class="rank-container"></div>
+        </div>
+    </div>
+</section>
+</div>
+<div id="customModal" class="modal-overlay hidden">
+<div class="modal-content">
+<div class="modal-header">
+<h3 id="modalTitle"></h3>
+<button id="closeModal" class="close-btn">&times;</button>
+</div>
+<div class="modal-body">
+<p id="modalMessage"></p>
+<input type="text" id="modalInput" class="hidden" />
+</div>
+<div class="modal-footer">
+<button id="modalConfirmBtn" class="tab">OK</button>
+<button id="modalCancelBtn" class="tab hidden">Batal</button>
+</div>
+</div>
+</div>
+<script>
+
+function speak(text) {
+    if ('speechSynthesis' in window) {
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'zh-CN'; // Atur bahasa ke Mandarin (Tiongkok)
+        utterance.volume = 1;     // Atur volume (0 sampai 1)
+        utterance.rate = 1;       // Atur kecepatan bicara (0.1 sampai 10)
+        utterance.pitch = 1;      // Atur nada (0 sampai 2)
+        window.speechSynthesis.speak(utterance);
+    } else {
+        alert('Maaf, browser Anda tidak mendukung Web Speech API.');
+    }
+}
+
+// Dapatkan elemen tombol suara
+const speakBtn = document.getElementById('speakBtn');
+
+// Tambahkan event listener saat kartu dibalik
+speakBtn.addEventListener('click', () => {
+    // Dapatkan Hanzi yang sedang ditampilkan.
+    // Asumsi Hanzi ditampilkan di elemen dengan ID 'frontText'
+    const hanziToSpeak = document.getElementById('frontText').textContent.trim();
+    if (hanziToSpeak && hanziToSpeak !== '—') {
+        speak(hanziToSpeak);
+    }
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Navigasi Section
+    const sectionIds = ["studyView", "quizView", "manageView", "accountView"];
+    const sections = sectionIds.map(id => document.getElementById(id));
+    const tabs = document.querySelectorAll(".nav.tab");
+    let currentIndex = 0;
+
+    function showSection(index) {
+        sections.forEach((sec, i) => {
+            sec.classList.toggle("hidden", i !== index);
+        });
+        tabs.forEach((tab, i) => {
+            tab.classList.toggle("active", i === index);
+        });
+        currentIndex = index;
+    }
+
+    // Aksi Kartu
+    const card = document.querySelector('.card');
+    const againBtn = document.getElementById('againBtn');
+    const goodBtn = document.getElementById('goodBtn');
+    
+    // --- Pastikan fungsi again() dan good() ada di sini atau di luar scope
+    // Ini adalah contoh placeholder. Anda mungkin sudah memiliki fungsi ini di file lain.
+    // Jika belum, Anda harus menambahkan definisi fungsi ini.
+    function again() {
+      // Kode untuk menandai kartu 'Again'
+      againBtn.click(); // Memicu tombol 'Again'
+    }
+
+    function good() {
+      // Kode untuk menandai kartu 'Good'
+      goodBtn.click(); // Memicu tombol 'Good'
+    }
+    // ---
+
+    let startX = 0;
+    const swipeThreshold = 50;
+
+    // Unified Touch/Swipe Listener
+    document.addEventListener('touchstart', (e) => {
+        startX = e.touches[0].clientX;
+    });
+
+    document.addEventListener('touchend', (e) => {
+        const endX = e.changedTouches[0].clientX;
+        const diffX = startX - endX;
+
+        // Cek apakah sentuhan dimulai dari dalam elemen .card
+        if (e.target.closest('.card')) {
+            if (Math.abs(diffX) > swipeThreshold) {
+                if (diffX > 0) {
+                    // Swipe ke kiri, picu Again
+                    again();
+                } else {
+                    // Swipe ke kanan, picu Good
+                    good();
+                }
+            }
+            // Penting: Hentikan eksekusi lebih lanjut untuk mencegah swipe section
+            return; 
+        }
+
+        // Logika untuk swipe antar section
+        if (Math.abs(diffX) > 70) {
+            if (diffX > 0 && currentIndex < sections.length - 1) {
+                showSection(currentIndex + 1);
+            } else if (diffX < 0 && currentIndex > 0) {
+                showSection(currentIndex - 1);
+            }
+        }
+    });
+
+    // Cegah swipe antar section di dalam table-wrapper
+    const tableWrappers = document.querySelectorAll('.table-wrapper');
+    tableWrappers.forEach(wrapper => {
+        wrapper.addEventListener('touchstart', (event) => {
+            event.stopPropagation();
+        });
+        wrapper.addEventListener('touchend', (event) => {
+            event.stopPropagation();
+        });
+    });
+});
+
+// ===== Utils & Types =====
+const $ = (sel, root = document) => root.querySelector(sel);
+const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
+const uid = () => Math.random().toString(36).slice(2, 9);
+const CARDS_STORAGE_KEY = 'mandarin_flashcards'; // Changed to differentiate
+const ACCOUNT_STORAGE_KEY = 'mandarin_flashcards_user_account'; // NEW
+
+/** @typedef {{id:string,hanzi:string,pinyin:string,arti:string,stats:{good:number,again:number}, status?:'again'|'good'}} Card */
+/** @type {Card[]} */
+let cards = [];
+let studyOrder = [];
+let studyIndex = 0;
+let flipped = false;
+let today = {
+    good: 0,
+    again: 0
+};
+let studyMode = 'hanzi'; // Default mode
+let currentFilter = 'all'; // New state for card filtering
+let customSlideDuration = 300; // ⭐ DEFAULT UNTUK DURASI SLIDE
+
+let userAccount; // Global variable for user account
+
+// Default account structure for new users or validation
+// Default account structure for new users or validation
+const defaultAccount = {
+    username: "Pengguna Baru",
+    level: 1,
+    xp: 0,
+    rank: "Bronze",
+    stats: {
+        cardsStudied: 0,
+        goodAnswers: 0,
+        againAnswers: 0,
+        totalQuizzes: 0,
+        correctAnswers: 0,
+        wrongAnswers: 0,
+        accuracy: 0
+    },
+    lastLogin: new Date().toISOString(),
+    pfp: "",
+    description: "Tulis deskripsi singkat tentang diri Anda di sini." // ⭐ BARIS BARU INI
+};
+
+// XP needed to level up (xpPerLevel[currentLevel-1] is XP to reach next level from current)
+// Total XP accumulated to reach a level
+// function generateXpThresholds(maxLevel = 100) {
+//     let thresholds = [0]; 
+//     let xp = 0;
+//     let increment = 100; // XP awal untuk level 1
+//     for (let i = 1; i <= maxLevel; i++) {
+//         xp += increment;
+//         thresholds.push(xp);
+//         increment = Math.floor(increment * 1.5); // naik 1.5x tiap level
+//     }
+//     thresholds.push(Infinity); 
+//     return thresholds;
+// }
+
+// const xpThresholds = generateXpThresholds(100);
+
+
+const xpThresholds = [
+    0,       // Level 1
+    100,    // Level 2
+    202,    // Level 3
+    303,    // Level 4
+    504,    // Level 5
+    1051,    // Level 6
+    2061,    // Level 7
+    3071,    // Level 8
+    6081,    // Level 9
+    9091,    // Level 10
+    10101,   // Level 11
+    11111,   // Level 12
+    12121,   // Level 13
+    13131,   // Level 14
+    14141,   // Level 15
+    15152,   // Level 16
+    16162,   // Level 17
+    17172,   // Level 18
+    18182,   // Level 19
+    19192,   // Level 20
+    20202,   // Level 21
+    21212,   // Level 22
+    22222,   // Level 23
+    23232,   // Level 24
+    24242,   // Level 25
+    25253,   // Level 26
+    26263,   // Level 27
+    27273,   // Level 28
+    28283,   // Level 29
+    29293,   // Level 30
+    30303,   // Level 31
+    31313,   // Level 32
+    32323,   // Level 33
+    33333,   // Level 34
+    34343,   // Level 35
+    35354,   // Level 36
+    36364,   // Level 37
+    37374,   // Level 38
+    38384,   // Level 39
+    39394,   // Level 40
+    40404,   // Level 41
+    41414,   // Level 42
+    42424,   // Level 43
+    43434,   // Level 44
+    44444,   // Level 45
+    45455,   // Level 46
+    46465,   // Level 47
+    47475,   // Level 48
+    48485,   // Level 49
+    49495,   // Level 50
+    50505,   // Level 51
+    51515,   // Level 52
+    52525,   // Level 53
+    53535,   // Level 54
+    54545,   // Level 55
+    55556,   // Level 56
+    56566,   // Level 57
+    57576,   // Level 58
+    58586,   // Level 59
+    59596,   // Level 60
+    60606,   // Level 61
+    61616,   // Level 62
+    62626,   // Level 63
+    63636,   // Level 64
+    64646,   // Level 65
+    65657,   // Level 66
+    66667,   // Level 67
+    67677,   // Level 68
+    68687,   // Level 69
+    69697,   // Level 70
+    70707,   // Level 71
+    71717,   // Level 72
+    72727,   // Level 73
+    73737,   // Level 74
+    74747,   // Level 75
+    75758,   // Level 76
+    76768,   // Level 77
+    77778,   // Level 78
+    78788,   // Level 79
+    79798,   // Level 80
+    80808,   // Level 81
+    81818,   // Level 82
+    82828,   // Level 83
+    83838,   // Level 84
+    84848,   // Level 85
+    85859,   // Level 86
+    86869,   // Level 87
+    87879,   // Level 88
+    88889,   // Level 89
+    89899,   // Level 90
+    90909,   // Level 91
+    91919,   // Level 92
+    92929,   // Level 93
+    93939,   // Level 94
+    94949,   // Level 95
+    95960,   // Level 96
+    96970,   // Level 97
+    97980,   // Level 98
+    98990,   // Level 99
+    100000,  // Level 100
+    103500, // Level 101
+    108100, // Level 102
+    112800, // Level 103
+    117600, // Level 104
+    122500, // Level 105
+    127500, // Level 107
+    132600, // Level 108
+    137800, // Level 109
+    143100, // Level 110
+    148500, // Level 111
+    154000, // Level 112
+    159600, // Level 113
+    165300, // Level 114
+    171100, // Level 115
+    177000, // Level 116
+    183000, // Level 117
+    189100, // Level 118
+    195300, // Level 119
+    201600, // Level 120
+    208000, // Level 121
+    214500, // Level 122
+    221100, // Level 123
+    227800, // Level 124
+    234600, // Level 125
+    241500, // Level 126
+    248500, // Level 127
+    255600, // Level 128
+    262800, // Level 129
+    270100, // Level 130
+    277500, // Level 131
+    285000, // Level 132
+    292600, // Level 133
+    300300, // Level 134
+    308100, // Level 135
+    316000, // Level 136
+    324000, // Level 137
+    332100, // Level 138
+    340300, // Level 139
+    348600, // Level 140
+    357000, // Level 141
+    365500, // Level 142
+    374100, // Level 143
+    382800, // Level 144
+    391600, // Level 145
+    400500, // Level 146
+    409500, // Level 147
+    418600, // Level 148
+    427800, // Level 149
+    437100, // Level 150
+    446500, // Level 151
+    456000, // Level 152
+    465600, // Level 153
+    475300, // Level 154
+    485100, // Level 155
+    500000, // Level 156
+    505000, // Level 157
+    510000, // Level 158
+    515000, // Level 159
+    520000, // Level 160
+    Infinity
+];
+
+// Rank tiers based on level
+const rankTiers = [
+    { level: 1, name: "Bronze" },
+    { level: 5, name: "Silver" },
+    { level: 10, name: "Gold" },
+    { level: 15, name: "Crystal" },
+    { level: 20, name: "Platinum" },
+    { level: 25, name: "Sapphire" },
+    { level: 30, name: "Diamond" },
+    { level: 35, name: "Obsidian" },
+    { level: 40, name: "Titanium" },
+    { level: 45, name: "Mythic" },
+    { level: 50, name: "Master" },
+    { level: 55, name: "Immortal" },
+    { level: 60, name: "Phoenix" },
+    { level: 65, name: "Griffin" },
+    { level: 70, name: "Celestial" },
+    { level: 75, name: "Dragon" },
+    { level: 80, name: "Legend" },
+    { level: 85, name: "Eternal" },
+    { level: 90, name: "Amethyst" },
+    { level: 95, name: "Cosmic" },
+    { level: 100, name: "Monarch" },
+    { level: 110, name: "Stellar" },
+    { level: 120, name: "Radiant" },
+    { level: 130, name: "Divine" },
+    { level: 140, name: "Aether" },
+    { level: 150, name: "Zenith" },
+    { level: 160, name: "Absolute" },
+];
+
+
+// ===== CUSTOM MODAL FUNCTIONS =====
+function customAlert(message) {
+    return new Promise(resolve => {
+        const modal = $('#customModal');
+        $('#modalTitle').textContent = 'Pesan';
+            
+        // ⭐ PERBAIKAN DI SINI
+        // Ganti \n dengan <br> agar line break berfungsi di HTML
+        $('#modalMessage').innerHTML = message.replace(/\n/g, '<br>');
+            
+        $('#modalConfirmBtn').textContent = 'OK';
+        $('#modalConfirmBtn').classList.remove('hidden');
+        $('#modalCancelBtn').classList.add('hidden');
+        modal.classList.remove('hidden');
+
+        const confirmHandler = () => {
+        modal.classList.add('hidden');
+            $('#modalConfirmBtn').removeEventListener('click', confirmHandler);
+            resolve();
+        };
+
+        $('#modalConfirmBtn').addEventListener('click', confirmHandler);
+        $('#closeModal').addEventListener('click', confirmHandler);
+    });
+}
+
+function customConfirm(message) {
+    return new Promise(resolve => {
+        const modal = $('#customModal');
+        $('#modalTitle').textContent = 'Konfirmasi';
+        $('#modalMessage').textContent = message;
+        $('#modalConfirmBtn').textContent = 'Ya';
+        $('#modalConfirmBtn').classList.remove('hidden');
+        $('#modalCancelBtn').classList.remove('hidden');
+        modal.classList.remove('hidden');
+
+        const confirmHandler = () => {
+            modal.classList.add('hidden');
+            $('#modalConfirmBtn').removeEventListener('click', confirmHandler);
+            $('#modalCancelBtn').removeEventListener('click', cancelHandler);
+            $('#closeModal').removeEventListener('click', cancelHandler);
+            resolve(true);
+        };
+
+        const cancelHandler = () => {
+            modal.classList.add('hidden');
+            $('#modalConfirmBtn').removeEventListener('click', confirmHandler);
+            $('#modalCancelBtn').removeEventListener('click', cancelHandler);
+            $('#closeModal').removeEventListener('click', cancelHandler);
+            resolve(false);
+        };
+
+        $('#modalConfirmBtn').addEventListener('click', confirmHandler);
+        $('#modalCancelBtn').addEventListener('click', cancelHandler);
+        $('#closeModal').addEventListener('click', cancelHandler);
+    });
+}
+
+function customPrompt(message, defaultValue = '', title = 'Input Diperlukan') { // Added title parameter
+    return new Promise(resolve => {
+        const modal = $('#customModal');
+        const input = $('#modalInput');
+        const confirmBtn = $('#modalConfirmBtn');
+        const cancelBtn = $('#modalCancelBtn');
+        const closeModalBtn = $('#closeModal');
+
+        // Set modal content and show elements
+        $('#modalTitle').textContent = title; // Use the new title
+        $('#modalMessage').textContent = message;
+        input.value = defaultValue;
+        input.classList.remove('hidden'); // Show the input field
+        confirmBtn.textContent = 'OK';
+        confirmBtn.classList.remove('hidden');
+        cancelBtn.textContent = 'Batal';
+        cancelBtn.classList.remove('hidden');
+        modal.classList.remove('hidden');
+
+        const confirmHandler = () => {
+            // Hide input and resolve with the value
+            input.classList.add('hidden'); // Hide the input field again
+            modal.classList.add('hidden');
+            cleanupListeners();
+            resolve(input.value);
+        };
+
+        const cancelHandler = () => {
+            // Hide input and resolve with null
+            input.classList.add('hidden'); // Hide the input field again
+            modal.classList.add('hidden');
+            cleanupListeners();
+            resolve(null);
+        };
+
+        const cleanupListeners = () => {
+            confirmBtn.removeEventListener('click', confirmHandler);
+            cancelBtn.removeEventListener('click', cancelHandler);
+            closeModalBtn.removeEventListener('click', cancelHandler);
+        };
+
+        // Add event listeners
+        confirmBtn.addEventListener('click', confirmHandler);
+        cancelBtn.addEventListener('click', cancelHandler);
+        closeModalBtn.addEventListener('click', cancelHandler);
+    });
+}
+
+// ===== Views (Belajar / Kuis / Kelola / Akun) =====
+const views = {
+    studyView: $('#studyView'),
+    quizView: $('#quizView'),
+    manageView: $('#manageView'),
+    accountView: $('#accountView'), // NEW: Account View
+    ranksView: $('#ranksView') // NEW: Account View
+};
+$$('.tab[data-view]').forEach(btn => btn.addEventListener('click', () => setView(btn.dataset.view)));
+
+function setView(id) {
+    for (const k in views) {
+        views[k].classList.toggle('hidden', k !== id);
+    }
+    $$('.tab[data-view]').forEach(b => b.classList.toggle('active', b.dataset.view === id));
+    if (id === 'accountView') {
+        renderAccountUI(); // Refresh account UI when viewing account tab
+    }
+}
+
+// ===== Persistence for Cards =====
+function loadCards() {
+    try {
+        cards = JSON.parse(localStorage.getItem(CARDS_STORAGE_KEY) || '[]');
+    } catch (e) {
+        cards = [];
+        console.error("Gagal memuat kartu, membuat array kosong.", e);
+    }
+}
+
+function saveCards() {
+    localStorage.setItem(CARDS_STORAGE_KEY, JSON.stringify(cards));
+}
+
+
+// ===== Persistence for User Account =====
+function loadAccountData() {
+    let loadedAccount = null;
+    try {
+        const accountJSONString = localStorage.getItem(ACCOUNT_STORAGE_KEY);
+        if (accountJSONString) {
+            loadedAccount = JSON.parse(accountJSONString);
+            // Merge with default to ensure all fields are present and valid
+            userAccount = { ...defaultAccount, ...loadedAccount };
+            userAccount.stats = { ...defaultAccount.stats, ...loadedAccount.stats };
+            
+            // Ensure stats are numbers and non-negative
+            for (const key in userAccount.stats) {
+                if (typeof userAccount.stats[key] !== 'number' || userAccount.stats[key] < 0) {
+                    userAccount.stats[key] = defaultAccount.stats[key];
+                }
+            }
+
+            // Recalculate accuracy to ensure consistency
+            const totalAttemptedQuizQuestions = userAccount.stats.correctAnswers + userAccount.stats.wrongAnswers;
+            if (totalAttemptedQuizQuestions > 0) {
+                userAccount.stats.accuracy = (userAccount.stats.correctAnswers / totalAttemptedQuizQuestions) * 100;
+            } else {
+                userAccount.stats.accuracy = 0;
+            }
+
+
+            // Recalculate level and rank based on XP to ensure consistency
+            userAccount = calculateRankAndLevel(userAccount);
+
+            console.log("Akun berhasil dimuat:", userAccount);
+        } else {
+            userAccount = { ...defaultAccount };
+            console.log("Tidak ada akun ditemukan, membuat akun default baru.");
+        }
+    } catch (e) {
+        console.error("Gagal mengurai akun dari localStorage, membuat akun default baru.", e);
+        userAccount = { ...defaultAccount };
+    }
+    saveAccountData(); // Save the (potentially validated/default) account
+    return userAccount;
+}
+
+function saveAccountData() {
+    localStorage.setItem(ACCOUNT_STORAGE_KEY, JSON.stringify(userAccount));
+    renderAccountUI();
+}
+
+// ===== Quiz Mode (fixed + stats) =====
+let quizSession = null;
+const quizBox = $('#quizBox');
+const qStem = $('#qStem');
+const qChoices = $('#qChoices');
+const quizScore = $('#quizScore');
+const quizTotal = $('#quizTotal');
+const quizGrade = $('#quizGrade');
+const xpGain = $('#xpGain');
+const quizFeedback = $('#quizFeedback');
+const numSel = $('#numSel');
+const cChoicesSel = $('#cChoices'); // Renamed to avoid conflict with qChoices element
+const customWrap = $('#customNumWrap');
+const customNumInput = $('#customNum');
+const nextQBtn = $('#nextQBtn');
+const prevQBtn = $('#prevQBtn');
+const quizStatsEl = $('#quizStats');
+
+numSel.addEventListener('change', () => {
+    if (numSel.value === 'custom') customWrap.style.display = 'block';
+    else customWrap.style.display = 'none';
+});
+
+// Cek duplikat
+function checkForDuplicates(field) {
+    const values = cards.map(card => card[field]);
+    const counts = {};
+    const duplicates = [];
+
+    // Hitung kemunculan setiap nilai
+    values.forEach(val => {
+        counts[val] = (counts[val] || 0) + 1;
+    });
+
+    // Cari nilai yang muncul lebih dari sekali
+    for (const val in counts) {
+        if (counts[val] > 1) {
+            duplicates.push(val);
+        }
+    }
+
+    const uniqueValues = new Set(values);
+
+    return {
+        isDuplicate: duplicates.length > 0,
+        totalUnique: uniqueValues.size,
+        totalCards: values.length,
+        duplicatesCount: duplicates.length,
+        duplicateList: duplicates, // Tambahkan daftar duplikat di sini
+    };
+}
+
+const quizSettings = document.querySelector('.quiz-settings');
+
+$('#startQuizBtn').addEventListener('click', async () => {
+    const numChoices = parseInt(cChoicesSel.value, 10);
+    if (cards.length < numChoices) {
+        await customAlert(`Jumlah kartu (${cards.length}) harus lebih besar atau sama dengan jumlah pilihan (${numChoices}). Tambahkan kartu lagi di menu Kelola.`);
+        return;
+    }
+    let n;
+    if (numSel.value === 'custom') {
+        const v = parseInt(customNumInput.value, 10);
+        if (!v || v < 1) {
+            await customAlert('Masukkan jumlah soal kustom yang valid (>=1).');
+            return;
+        }
+        n = Math.min(v, cards.length);
+    } else {
+        n = Math.min(parseInt(numSel.value, 10), cards.length);
+    }
+
+    if (n === 0) {
+        await customAlert('Tidak ada kartu untuk kuis. Tambahkan kartu di menu Kelola.');
+        return;
+    }
+    
+    const mode = $('#modeSel').value;
+
+    // --- LOGIKA BARU UNTUK MENCEGAH BUG ---
+    let fieldToCheck = null;
+    let fieldName = '';
+
+    if (mode === 'arti-hanzi' || mode === 'pinyin-hanzi') {
+        fieldToCheck = 'hanzi';
+        fieldName = 'Hanzi';
+    } else if (mode === 'arti-pinyin' || mode === 'hanzi-pinyin') {
+        fieldToCheck = 'pinyin';
+        fieldName = 'Pinyin';
+    }
+
+    if (fieldToCheck) {
+        const checkResult = checkForDuplicates(fieldToCheck);
+        if (checkResult.isDuplicate) {
+            const requiredUnique = numChoices;
+            const availableUnique = checkResult.totalUnique;
+            
+            // Buat pesan untuk daftar duplikat
+            const duplicateItems = checkResult.duplicateList.join(', ');
+            const duplicateMessage = `Ada duplikasi pada ${fieldName} berikut: ${duplicateItems}.\n`;
+
+            if (availableUnique < requiredUnique) {
+                await customAlert(
+                    `Kuis tidak bisa dimulai.\n\n` +
+                    `Tipe soal ini memerlukan ${numChoices} pilihan ganda unik.\n` +
+                    `Namun, hanya tersedia ${availableUnique} ${fieldName} unik dari ${checkResult.totalCards} total kartu.\n\n` +
+                    duplicateMessage +
+                    `\nSilakan kurangi jumlah pilihan ganda atau perbaiki data duplikat di menu Kelola.`
+                );
+                return;
+            }
+        }
+    }
+    // --- AKHIR DARI LOGIKA BARU ---
+
+    const pool = shuffle([...cards]).slice(0, Math.max(1, n));
+    quizSession = {
+        mode,
+        pool: pool.map(c => ({...c, answered: false, chosen: null, choices: null})),
+        idx: 0,
+        score: 0,
+        correctCount: 0,
+        wrongCount: 0,
+        resultsTotal: n
+    };
+
+    quizTotal.textContent = n;
+    quizScore.textContent = 0;
+    quizGrade.textContent = 0;
+    xpGain.textContent = 0;
+    quizBox.style.display = 'block';
+
+    // Tombol next dan prev dinonaktifkan di awal
+    nextQBtn.disabled = true;
+    prevQBtn.disabled = true;
+
+    // KECUALI jika hanya ada 1 soal, tombol next tidak transparan
+    if (quizSession.pool.length > 1) {
+        nextQBtn.classList.remove('transparent');
+    } else {
+        nextQBtn.classList.add('transparent');
+    }
+    prevQBtn.classList.add('transparent');
+
+    updateQuizStatsUI();
+    quizSettings.classList.add('hidden');
+    showQuestionAt(0);
+});
+
+nextQBtn.addEventListener('click', () => showNextQuestion());
+prevQBtn.addEventListener('click', () => showPreviousQuestion());
+
+$('#endQuizBtn').addEventListener('click', async () => {
+    if (!quizSession) {
+        return;
+    }
+    if (await customConfirm('Apakah Anda yakin ingin mengakhiri kuis ini? Progres kuis Anda akan disimpan.')) {
+        await endQuiz();
+    }
+});
+
+async function endQuiz() {
+    if (!quizSession) return;
+
+    const quizResults = {
+        correct: quizSession.correctCount,
+        wrong: quizSession.wrongCount,
+        total: quizSession.resultsTotal
+    };
+
+    totalChoices = parseInt(cChoicesSel.value, 10);
+    const accountUpdateInfo = updateAccountOnQuizCompletion(quizResults, totalChoices);
+
+    let alertMessage = `Kuis Selesai!\nSkor: ${quizResults.correct} / ${quizResults.total}\nBenar: ${quizResults.correct} · Salah: ${quizResults.wrong} · Nilai: ${getPercent(quizResults.correct, quizResults.total)}%`;
+    alertMessage += `\nXP Didapat: ${accountUpdateInfo.xpGained} XP`;
+
+    if (accountUpdateInfo.levelUp) {
+        alertMessage += `\n\nSelamat! Anda naik level ke ${accountUpdateInfo.newLevel}!\nPeringkat Anda sekarang: ${accountUpdateInfo.newRank}.`;
+    }
+
+    await customAlert(alertMessage);
+
+    quizSession = null;
+    quizBox.style.display = 'none';
+    qChoices.innerHTML = '';
+    qStem.textContent = '—';
+    quizFeedback.textContent = '';
+    quizStatsEl.textContent = `Benar: 0 · Salah: 0 · 0% · 0xp`;
+    quizSettings.classList.remove('hidden');
+    renderAccountUI();
+}
+
+// Fixed navigation functions
+function showNextQuestion() {
+    if (!quizSession) return;
+    if (quizSession.idx >= quizSession.pool.length - 1) {
+        endQuiz();
+        return;
+    }
+    quizSession.idx++;
+    showQuestionAt(quizSession.idx);
+    // Atur status tombol 'next'
+    if (!quizSession.pool[quizSession.idx].answered) {
+        nextQBtn.disabled = true;
+    } else {
+        nextQBtn.disabled = false;
+    }
+    // Atur status tombol 'prev'
+    prevQBtn.disabled = false;
+}
+
+function showPreviousQuestion() {
+    if (!quizSession) return;
+    if (quizSession.idx <= 0) {
+        prevQBtn.disabled = true;
+        return;
+    }
+    quizSession.idx--;
+    nextQBtn.disabled = false;
+    showQuestionAt(quizSession.idx);
+    if (quizSession.idx === 0) {
+        prevQBtn.disabled = true;
+    }
+}
+
+// Central function to show questions
+// Central function to show questions
+function showQuestionAt(index) {
+    if (!quizSession) return;
+    if (index < 0 || index >= quizSession.pool.length) return;
+
+    // Menyesuaikan tombol navigasi
+    prevQBtn.classList.toggle('transparent', index === 0);
+    nextQBtn.classList.toggle('transparent', index === quizSession.pool.length - 1);
+
+    const qNumber = $('#qNumber');
+    qNumber.textContent = `Soal ${index + 1} dari ${quizSession.pool.length}`;
+
+    const item = quizSession.pool[index];
+    // Dapatkan semua properti yang relevan dari buildPrompt, termasuk 'audio' dan 'textToSpeak'
+    const { prompt, correct, field, audio, textToSpeak } = buildPrompt(item, quizSession.mode);
+
+    // Tampilkan prompt soal
+    qStem.innerHTML = ''; // Bersihkan konten sebelumnya
+    const promptDiv = document.createElement('div');
+    promptDiv.textContent = prompt;
+    qStem.appendChild(promptDiv);
+
+    // Jika mode kuis adalah "listening", tambahkan tombol suara
+    if (audio) {
+        const qSpeakBtn = document.createElement('button');
+        qSpeakBtn.id = 'qSpeakBtn';
+        qSpeakBtn.className = 'tab';
+        qSpeakBtn.textContent = '🔊';
+        qSpeakBtn.addEventListener('click', () => {
+            speak(textToSpeak);
+        });
+        qStem.appendChild(qSpeakBtn);
+    }
+    
+    quizTotal.textContent = quizSession.pool.length;
+    qChoices.innerHTML = '';
+    quizFeedback.innerHTML = '';
+
+    if (item.answered) {
+        const feedbackText = `Jawaban: <span style="font-weight:600;color:var(--text)">${item.hanzi} / ${item.pinyin} / ${item.arti}</span>`;
+        if (item.chosen === correct) {
+            quizFeedback.innerHTML = `Benar! <br>${feedbackText}`;
+        } else {
+            quizFeedback.innerHTML = `Salah. Jawaban yang benar adalah: ${correct}<br>${feedbackText}`;
+        }
+        nextQBtn.disabled = false;
+    } else {
+        nextQBtn.disabled = true;
+    }
+
+    const choicesToDisplay = item.choices || buildAndStoreChoices(item, correct, field);
+
+    choicesToDisplay.forEach(text => {
+        const btn = document.createElement('button');
+        btn.className = 'choice';
+
+        // Tentukan apakah tombol harus memutar suara
+        if (quizSession.mode === 'hanzi-sound' || quizSession.mode === 'arti-sound') {
+            qSpeakBtn.className = 'hidden';
+            btn.textContent = '🔊';
+            btn.dataset.textToSpeak = text; // Simpan teks yang akan diucapkan di atribut data
+            btn.addEventListener('click', (e) => {
+                // Untuk mencegah pemilihan jawaban saat hanya memutar suara,
+                // tambahkan logika tambahan di sini
+                // Untuk saat ini, kita biarkan saja agar memutar suara
+                speak(e.currentTarget.dataset.textToSpeak);
+            });
+            // Gunakan event listener terpisah untuk memilih jawaban
+            btn.addEventListener('dblclick', () => selectChoice(btn, text, correct));
+        } else {
+            btn.textContent = text;
+            btn.addEventListener('click', () => selectChoice(btn, text, correct));
+        }
+
+        // Tampilkan status jawaban setelah pengguna menjawab
+        if (item.answered) {
+            btn.disabled = true;
+            if (text === correct) {
+                btn.classList.add('correct');
+            }
+            if (text === item.chosen && text !== correct) {
+                btn.classList.add('wrong');
+            }
+        }
+        qChoices.appendChild(btn);
+    });
+
+    updateQuizStatsUI();
+}
+
+function selectChoice(btn, val, correct) {
+    const currentCard = quizSession.pool[quizSession.idx];
+
+    if (currentCard.answered) return;
+
+    currentCard.chosen = val;
+    currentCard.answered = true;
+
+    if (val === correct) {
+        quizSession.score++;
+        quizSession.correctCount++;
+    } else {
+        quizSession.wrongCount++;
+    }
+    quizScore.textContent = quizSession.score;
+
+    nextQBtn.disabled = false; // Baris ini yang paling penting
+    
+    showQuestionAt(quizSession.idx);
+    updateQuizStatsUI();
+}
+
+function updateQuizStatsUI() {
+    if (!quizSession) {
+        quizStatsEl.textContent = `Benar: 0 · Salah: 0 · 0% · 0xp`;
+        return;
+    }
+        totalChoices = parseInt(cChoicesSel.value, 10);
+    let expMultiplier = 10;
+
+    if (totalChoices >= 2 && totalChoices <= 4) {
+        expMultiplier = 5;
+    } else if (totalChoices >= 6 && totalChoices <= 10) {
+        expMultiplier = 10;
+    } else if (totalChoices >= 12 && totalChoices <= 20) {
+        expMultiplier = 15;
+    } else if (totalChoices >= 24 && totalChoices <= 30) {
+        expMultiplier = 20;
+    } else if (totalChoices >= 40 && totalChoices <= 50) {
+        expMultiplier = 25;
+    } else if (totalChoices >= 75 && totalChoices <= 150) {
+        expMultiplier = 30;
+    } else {
+        expMultiplier = 0;
+    }
+    const expGained = quizSession.correctCount * expMultiplier;
+    const correct = quizSession.correctCount || 0;
+    const wrong = quizSession.wrongCount || 0;
+    const totalAttempted = correct + wrong;
+    const percent = getPercent(correct, quizSession.resultsTotal);
+    quizStatsEl.textContent = `Benar: ${correct} · Salah: ${wrong} · ${percent}% · ${expGained}xp`;
+    quizGrade.textContent = percent;
+    xpGain.textContent = expGained;
+}
+
+
+function getPercent(correct, total) {
+    if (!total || total <= 0) return 0;
+    return Math.round((correct / total) * 100);
+}
+
+function buildAndStoreChoices(item, correct, field) {
+    const numChoices = parseInt(cChoicesSel.value, 10);
+    const distractors = pickDistractors(item, field, numChoices - 1);
+    const choices = shuffle([correct, ...distractors]);
+    item.choices = choices;
+    return choices;
+}
+
+function buildPrompt(card, mode) {
+    switch (mode) {
+        case 'hanzi-arti':
+            return {
+                prompt: `${card.hanzi} artinya?`,
+                correct: card.arti,
+                field: 'arti'
+            };
+        case 'hanzi-pinyin':
+            return {
+                prompt: `Pinyin dari ${card.hanzi}?`,
+                correct: card.pinyin,
+                field: 'pinyin'
+            };
+        case 'arti-hanzi':
+            return {
+                prompt: `${card.arti} dalam Hanzi?`,
+                correct: card.hanzi,
+                field: 'hanzi'
+            };
+        case 'arti-pinyin':
+            return {
+                prompt: `${card.arti} dalam Pinyin?`,
+                correct: card.pinyin,
+                field: 'pinyin'
+            };
+        case 'pinyin-arti':
+            return {
+                prompt: `${card.pinyin} artinya?`,
+                correct: card.arti,
+                field: 'arti'
+            };
+        case 'pinyin-hanzi':
+            return {
+                prompt: `${card.pinyin} dalam Hanzi?`,
+                correct: card.hanzi,
+                field: 'hanzi'
+            };
+                case 'sound-hanzi':
+            return {
+                prompt: 'Dengarkan suara ini, lalu pilih Hanzi yang benar.',
+                correct: card.hanzi,
+                field: 'hanzi',
+                audio: true,
+                textToSpeak: card.hanzi
+            };
+        case 'hanzi-sound':
+            return {
+                prompt: `[double click choices] Pilih suara yang benar untuk Hanzi ini: ${card.hanzi}`,
+                correct: card.hanzi, // Jawaban benar adalah Hanzi yang sesuai dengan suara
+                field: 'hanzi',
+                audio: true,
+                textToSpeak: card.hanzi
+            };
+        case 'sound-arti':
+            return {
+                prompt: 'Dengarkan suara ini, lalu pilih artinya yang benar.',
+                correct: card.arti,
+                field: 'arti',
+                audio: true,
+                textToSpeak: card.hanzi
+            };
+        case 'arti-sound':
+            return {
+                prompt: `[double click choices] Pilih suara yang benar untuk arti ini: ${card.arti}`,
+                correct: card.hanzi, // Jawaban benar adalah Hanzi yang sesuai dengan suara
+                field: 'hanzi',
+                audio: true,
+                textToSpeak: card.hanzi
+            };
+        default:
+            return {
+                prompt: `${card.hanzi} artinya?`,
+                correct: card.arti,
+                field: 'arti'
+            };
+    }
+}
+
+function pickDistractors(correctCard, field, k) {
+    const pool = cards.filter(c => c.id !== correctCard.id).map(c => c[field]).filter(Boolean);
+    const set = new Set();
+    while (set.size < k && pool.length > 0) {
+        const randomElement = pool[Math.floor(Math.random() * pool.length)];
+        if (randomElement && randomElement !== correctCard[field]) { // Ensure distractor is not the correct answer and not empty
+            set.add(randomElement);
+        }
+        if (set.size === pool.length) break; // Avoid infinite loop if pool is small
+    }
+    // If we still need more distractors, fill with placeholder
+    while (set.size < k) {
+        set.add('—');
+    }
+    return [...set];
+}
+
+// ===== Account Logic (XP, Level, Rank) =====
+function getTotalXpForNextLevelThreshold(currentLevel) {
+    if (currentLevel >= xpThresholds.length) return Infinity; // Max level reached or beyond defined thresholds
+    return xpThresholds[currentLevel]; // This is the total XP needed to reach (currentLevel + 1)
+}
+
+function calculateRankAndLevel(account) {
+    let currentXp = account.xp;
+    let newLevel = 1;
+
+    for (let i = 0; i < xpThresholds.length; i++) {
+        if (currentXp >= xpThresholds[i]) {
+            newLevel = i + 1;
+        } else {
+            break;
+        }
+    }
+    account.level = newLevel;
+
+    let newRank = "Unranked";
+    for (const tier of rankTiers) {
+        if (account.level >= tier.level) {
+            newRank = tier.name;
+        } else {
+            break; // Tiers are sorted, so we can stop
+        }
+    }
+    account.rank = newRank;
+
+    return account;
+}
+
+// Modified to return XP gained and level up info
+function updateAccountOnQuizCompletion(quizResults, totalChoices) {
+    userAccount.stats.totalQuizzes++;
+    userAccount.stats.correctAnswers += quizResults.correct;
+    userAccount.stats.wrongAnswers += quizResults.wrong;
+
+    const totalAttemptedQuizQuestions = userAccount.stats.correctAnswers + userAccount.stats.wrongAnswers;
+    if (totalAttemptedQuizQuestions > 0) {
+        userAccount.stats.accuracy = (userAccount.stats.correctAnswers / totalAttemptedQuizQuestions) * 100;
+    } else {
+        userAccount.stats.accuracy = 0;
+    }
+
+    let xpMultiplier = 10;
+
+    if (totalChoices >= 2 && totalChoices <= 4) {
+        xpMultiplier = 5;
+    } else if (totalChoices >= 6 && totalChoices <= 10) {
+        xpMultiplier = 10;
+    } else if (totalChoices >= 12 && totalChoices <= 20) {
+        xpMultiplier = 15;
+    } else if (totalChoices >= 24 && totalChoices <= 30) {
+        xpMultiplier = 20;
+    } else if (totalChoices >= 40 && totalChoices <= 50) {
+        xpMultiplier = 25;
+    } else if (totalChoices >= 75 && totalChoices <= 150) {
+        xpMultiplier = 30;
+    } else {
+        xpMultiplier = 0;
+    }
+    
+    // Hitung XP yang didapat menggunakan pengali yang sudah ditentukan
+    const xpGained = quizResults.correct * xpMultiplier;
+    userAccount.xp += xpGained;
+
+    const oldLevel = userAccount.level;
+    userAccount = calculateRankAndLevel(userAccount);
+    const levelUp = userAccount.level > oldLevel;
+
+    userAccount.lastLogin = new Date().toISOString();
+    saveAccountData();
+
+    return {
+        xpGained: xpGained,
+        levelUp: levelUp,
+        newLevel: userAccount.level,
+        newRank: userAccount.rank
+    };
+}
+
+function updateAccountOnStudy(type) {
+    userAccount.stats.cardsStudied++;
+    if (type === 'good') {
+        userAccount.stats.goodAnswers++;
+    } else if (type === 'again') {
+        userAccount.stats.againAnswers++;
+    }
+    userAccount.lastLogin = new Date().toISOString();
+    saveAccountData();
+}
+
+
+// ===== Manage: List Rendering =====
+function renderList() {
+    const tbody = $('#list');
+    tbody.innerHTML = '';
+    const q = ($('#search')?.value || '').trim().toLowerCase();
+    const filtered = cards.filter(c => 
+        c.hanzi.toLowerCase().includes(q) || 
+        c.pinyin.toLowerCase().includes(q) || 
+        c.arti.toLowerCase().includes(q)
+    );
+    $('#totalCount').textContent = cards.length;
+    filtered.forEach(c => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td style="font-size:1.2rem;font-weight:600">${escapeHtml(c.hanzi)}</td>
+        <td>${escapeHtml(c.pinyin)}</td>
+        <td>${escapeHtml(c.arti)}</td>
+        <td>
+        <button class="tab" data-edit="${c.id}">Edit</button>
+        <button class="tab" data-del="${c.id}">Hapus</button>
+        <button class="tab speakbtn" data-hanzi="${escapeHtml(c.hanzi)}">🔊</button>
+        </td>`;
+                tbody.appendChild(tr);
+            });
+
+            document.querySelectorAll('.speakbtn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const hanziToSpeak = e.currentTarget.dataset.hanzi;
+                    speak(hanziToSpeak);
+                });
+            });
+
+        }
+
+function escapeHtml(s) {
+    return s.replace(/[&<>]/g, ch => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;'
+    }[ch]));
+}
+
+// ===== Manage: Form Handlers =====
+$('#cardForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const rawId = $('#editingId').value;
+    const id = rawId ? String(rawId) : String(uid());
+    const existingIndex = cards.findIndex(c => String(c.id) === id);
+    const data = {
+        id,
+        hanzi: $('#hanzi').value.trim(),
+        pinyin: $('#pinyin').value.trim(),
+        arti: $('#arti').value.trim(),
+        stats: (existingIndex >= 0 ? cards[existingIndex].stats : {
+            good: 0,
+            again: 0
+        }),
+        status: (existingIndex >= 0 ? cards[existingIndex].status : undefined)
+    };
+    if (existingIndex >= 0) {
+        cards[existingIndex] = Object.assign({}, cards[existingIndex], data);
+    } else {
+        cards.unshift(data);
+    }
+    saveCards(); // Use saveCards
+    renderList();
+    buildStudyOrder();
+    (e.target).reset();
+    $('#editingId').value = '';
+    $('#hanzi').focus();
+    refreshStudyMeta();
+});
+$('#list').addEventListener('click', async (e) => {
+    const btn = e.target.closest('button');
+    if (!btn) return;
+    const editId = btn.getAttribute('data-edit');
+    const delId = btn.getAttribute('data-del');
+    if (editId) {
+        const c = cards.find(x => String(x.id) === String(editId));
+        if (!c) return;
+        $('#hanzi').value = c.hanzi;
+        $('#pinyin').value = c.pinyin;
+        $('#arti').value = c.arti;
+        $('#editingId').value = c.id;
+        setView('manageView');
+        $('#hanzi').focus();
+        return;
+    }
+    if (delId) {
+        if (await customConfirm('Hapus kartu ini?')) {
+            cards = cards.filter(x => String(x.id) !== String(delId));
+            saveCards(); // Use saveCards
+            buildStudyOrder();
+            renderList();
+            refreshStudyMeta();
+        }
+    }
+});
+$('#search')?.addEventListener('input', renderList);
+
+// ===== Card Import/Export/Reset =====
+$('#exportBtn').addEventListener('click', async () => {
+    let name = await customPrompt('Masukkan nama file untuk export kartu:', 'mandarin_flashcards');
+    if (name === null) {
+        return;
+    }
+    name = name.trim();
+    if (!name) {
+        await customAlert('Nama file tidak boleh kosong.');
+        return;
+    }
+    if (!name.toLowerCase().endsWith('.json')) {
+        name = name + '.json';
+    }
+    try {
+        const blob = new Blob([JSON.stringify(cards, null, 2)], {
+            type: 'application/json'
+        });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = name;
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+        await customAlert('Kartu berhasil diekspor.');
+    } catch (err) {
+        await customAlert('Gagal mengekspor kartu: ' + (err && err.message ? err.message : err));
+    }
+});
+
+$('#importInput').addEventListener('change', async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const text = await file.text();
+    try {
+        const data = JSON.parse(text);
+        if (Array.isArray(data)) {
+            const mapped = data.map(x => ({
+                id: String(x.id || uid()),
+                hanzi: x.hanzi?.toString() || '',
+                pinyin: x.pinyin?.toString() || '',
+                arti: x.arti?.toString() || '',
+                stats: x.stats || {
+                    good: 0,
+                    again: 0
+                },
+                status: x.status || undefined
+            })).filter(x => x.hanzi && x.pinyin && x.arti); // Only import cards with essential fields
+            cards = mapped;
+            saveCards(); // Use saveCards
+            buildStudyOrder();
+            renderList();
+            refreshStudyMeta();
+            await customAlert('Import sukses: ' + cards.length + ' kartu berhasil dimuat.');
+        } else {
+            await customAlert('Format tidak valid: file impor kartu harus berupa array JSON.');
+        }
+    } catch (err) {
+        await customAlert('Gagal import kartu: ' + err.message);
+    }
+    e.target.value = '';
+});
+$('#clearBtn').addEventListener('click', async () => {
+    if (await customConfirm('Reset semua data kartu? Ini akan menghapus semua kartu yang Anda miliki.')) {
+        cards = [];
+        saveCards(); // Use saveCards
+        buildStudyOrder();
+        renderList();
+        showOnCard(null);
+        refreshStudyMeta();
+        await customAlert('Semua kartu berhasil direset.');
+    }
+});
+
+// ===== Study Mode =====
+const frontText = $('#frontText');
+const backPinyin = $('#backPinyin');
+const backArti = $('#backArti');
+const backHanzi = $('#backHanzi');
+const cardWrapper = $('.card-wrapper');
+const studyCard = $('#studyCard');
+const studyCardInner = $('.card-inner');
+const progress = $('#progressBar');
+const studyMeta = $('#studyMeta');
+const todayStats = $('#todayStats');
+
+function buildStudyOrder() {
+    let filteredCards = cards;
+    if (currentFilter === 'again') {
+        filteredCards = cards.filter(c => c.status === 'again');
+    } else if (currentFilter === 'default') {
+        filteredCards = cards.filter(c => !c.status);
+    } else if (currentFilter === 'good') {
+        filteredCards = cards.filter(c => c.status === 'good');
+    }
+    studyOrder = filteredCards.map(c => c.id);
+    studyIndex = 0;
+    flipped = false;
+    showOnCard(current());
+    refreshStudyMeta();
+}
+
+function shuffle(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]]
+    }
+    return arr;
+}
+
+function current() {
+    return cards.find(c => c.id === studyOrder[studyIndex]) || null;
+}
+
+function showOnCard(card) {
+    if (!card) {
+        frontText.textContent = '—';
+        backPinyin.textContent = '—';
+        backArti.textContent = '—';
+        backHanzi.textContent = '—';
+        studyCard.classList.remove('flipped');
+        studyCardInner.classList.remove('is-again', 'is-good');
+        return;
+    }
+    if (studyMode === 'hanzi') {
+        frontText.textContent = card.hanzi;
+        backPinyin.textContent = card.pinyin;
+        backArti.textContent = card.arti;
+        backHanzi.textContent = '';
+    } else if (studyMode === 'pinyin') {
+        frontText.textContent = card.pinyin;
+        backPinyin.textContent = card.arti;
+        backArti.textContent = card.hanzi;
+        backHanzi.textContent = '';
+    } else if (studyMode === 'arti') {
+        frontText.textContent = card.arti;
+        backPinyin.textContent = card.pinyin;
+        backArti.textContent = card.hanzi;
+        backHanzi.textContent = '';
+    }
+    studyCard.classList.toggle('flipped', flipped);
+    studyCardInner.classList.remove('is-again', 'is-good');
+    if (card.status === 'again') {
+        studyCardInner.classList.add('is-again');
+    } else if (card.status === 'good') {
+        studyCardInner.classList.add('is-good');
+    }
+}
+
+function refreshStudyMeta() {
+    const total = studyOrder.length;
+    const idx = total ? studyIndex + 1 : 0;
+    studyMeta.textContent = `${idx}/${total}`;
+    todayStats.textContent = `Good: ${today.good} · Again: ${today.again}`;
+    progress.style.width = total ? ((idx / total) * 100).toFixed(1) + '%' : '0%';
+}
+
+// ⭐ Perbarui fungsi ini.
+function slideCard(direction) {
+    if ($('#animationToggle').checked) { // Tambahkan kondisi ini
+        if (!studyOrder.length) {
+            showOnCard(null);
+            refreshStudyMeta();
+            return;
+        }
+
+        const slideDuration = customSlideDuration;
+
+        flipped = false;
+        studyCard.classList.remove('flipped');
+        studyCardInner.classList.remove('is-again', 'is-good');
+
+        cardWrapper.style.transition = `transform ${slideDuration}ms ease-in-out, opacity ${slideDuration}ms ease-in-out`;
+        if (direction === 'next') {
+            cardWrapper.style.transform = 'translateX(-120%)';
+        } else {
+            cardWrapper.style.transform = 'translateX(120%)';
+        }
+        cardWrapper.style.opacity = '0';
+
+        setTimeout(() => {
+            if (direction === 'next') {
+                studyIndex = (studyIndex + 1) % studyOrder.length;
+            } else {
+                studyIndex = (studyIndex - 1 + studyOrder.length) % studyOrder.length;
+            }
+            showOnCard(current());
+            refreshStudyMeta();
+
+            cardWrapper.style.transition = 'none';
+            if (direction === 'next') {
+                cardWrapper.style.transform = 'translateX(120%);';
+            } else {
+                cardWrapper.style.transform = 'translateX(-120%)';
+            }
+            cardWrapper.style.opacity = '0';
+
+            void cardWrapper.offsetWidth;
+
+            cardWrapper.style.transition = `transform ${slideDuration}ms ease-out, opacity ${slideDuration}ms ease-out`;
+            cardWrapper.style.transform = 'translateX(0)';
+            cardWrapper.style.opacity = '1';
+        }, slideDuration);
+    } else { // Jika animasi dimatikan, pindah ke kartu berikutnya tanpa animasi
+        const total = studyOrder.length;
+        if (!total) {
+            showOnCard(null);
+            return;
+        }
+        if (direction === 'next') {
+            studyIndex = (studyIndex + 1) % total;
+        } else {
+            studyIndex = (studyIndex - 1 + total) % total;
+        }
+        flipped = false;
+        showOnCard(current());
+        refreshStudyMeta();
+    }
+}
+
+const animationToggle = $('#animationToggle');
+const slideDurationWrapper = $('#slideDurationWrapper');
+
+function updateAnimationState() {
+    const isChecked = animationToggle.checked;
+    slideDurationWrapper.style.display = isChecked ? 'block' : 'none';
+
+    // Reset card wrapper style if animation is turned off
+    if (!isChecked) {
+        cardWrapper.style.transition = 'none';
+        cardWrapper.style.transform = 'translateX(0)';
+        cardWrapper.style.opacity = '1';
+    }
+}
+
+// Tambahkan event listener untuk toggle
+animationToggle.addEventListener('change', updateAnimationState);
+
+// Panggil saat halaman dimuat untuk memastikan status awal sudah benar
+updateAnimationState();
+
+// Ini kode yang benar, tinggal panggil slideCard saja.
+function next() {
+    slideCard('next');
+}
+
+function prev() {
+    slideCard('prev');
+}
+
+function flip() {
+    flipped = !flipped;
+    studyCard.classList.toggle('flipped', flipped);
+}
+
+$$('#studyView [data-mode]').forEach(btn => {
+    btn.addEventListener('click', () => {
+        $$('#studyView [data-mode]').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        studyMode = btn.dataset.mode;
+        flipped = false;
+        showOnCard(current());
+    });
+});
+
+$$('#filter-group .tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+        $$('#filter-group .tab').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentFilter = btn.dataset.filter;
+        buildStudyOrder();
+    });
+});
+
+$('#nextBtn').addEventListener('click', next);
+$('#prevBtn').addEventListener('click', prev);
+$('#flipBtn').addEventListener('click', flip);
+$('#nextNav').addEventListener('click', next);
+$('#prevNav').addEventListener('click', prev);
+$('#flipNav').addEventListener('click', flip);
+
+// Dapatkan elemen teks "Again" dan "Good"
+const againText = document.querySelector('.center.again');
+const goodText = document.querySelector('.center.good');
+
+// Fungsi untuk menampilkan teks
+function showFeedbackText(type) {
+    // Tentukan elemen teks mana yang akan ditampilkan
+    const textElement = type === 'again' ? againText : goodText;
+
+    // Hapus kelas 'show' dari kedua elemen (untuk menyembunyikan yang sebelumnya)
+    againText.classList.remove('show');
+    goodText.classList.remove('show');
+
+    // Tambahkan kelas 'show' untuk menampilkan elemen yang dipilih
+    textElement.classList.add('show');
+
+    // Sembunyikan kembali teks setelah 1 detik
+    setTimeout(() => {
+        textElement.classList.remove('show');
+    }, 1000); // Durasi 1000ms (1 detik)
+}
+
+$('#againBtn').addEventListener('click', () => {
+    const c = current();
+    if (!c) return;
+    c.stats.again++;
+    c.status = 'again';
+    today.again++;
+    saveCards(); // Use saveCards
+    updateAccountOnStudy('again'); // NEW
+    if (currentFilter === 'all') {
+        next();
+    } else {
+        const oldId = c.id;
+        buildStudyOrder();
+        if (studyOrder.length > 0) {
+            const newIndex = studyOrder.indexOf(oldId);
+            if (newIndex !== -1) {
+                studyIndex = newIndex;
+            }
+        }
+        next();
+    }
+    showFeedbackText('again');
+
+});
+
+$('#goodBtn').addEventListener('click', () => {
+    const c = current();
+    if (!c) return;
+    c.stats.good++;
+    c.status = 'good';
+    today.good++;
+    saveCards(); // Use saveCards
+    updateAccountOnStudy('good'); // NEW
+    if (currentFilter === 'all') {
+        next();
+    } else {
+        const oldId = c.id;
+        buildStudyOrder();
+        if (studyOrder.length > 0) {
+            const newIndex = studyOrder.indexOf(oldId);
+            if (newIndex !== -1) {
+                studyIndex = newIndex;
+            }
+        }
+        next();
+    }
+    showFeedbackText('good');
+});
+
+$('#shuffleBtn')?.addEventListener('click', async () => {
+    shuffle(studyOrder);
+    studyIndex = 0;
+    flipped = false;
+    showOnCard(current());
+    refreshStudyMeta();
+    // NOTIFIKASI TAMBAHAN
+    await customAlert('Kartu belajar berhasil diacak ulang.');
+});
+
+$('#clearStatusBtn').addEventListener('click', async () => {
+    if (await customConfirm('Yakin ingin mereset status semua kartu (Again & Good)?')) {
+        cards.forEach(card => {
+            card.status = undefined;
+        });
+        today.good = 0;
+        today.again = 0;
+        saveCards(); // Use saveCards
+        buildStudyOrder();
+        refreshStudyMeta();
+        await customAlert('Semua status kartu berhasil direset.');
+    }
+});
+
+window.addEventListener('keydown', (e) => {
+    // Hanya berfungsi jika tidak ada modal yang terbuka
+    if (!$('#customModal').classList.contains('hidden')) return;
+
+    // Pintasan untuk menu Belajar
+    if (!views.studyView.classList.contains('hidden')) {
+        if (e.code === 'Space') {
+            e.preventDefault();
+            flip();
+        }
+        if (e.key === 'ArrowRight') next();
+        if (e.key === 'ArrowLeft') prev();
+        if (e.key.toLowerCase() === 'g') $('#goodBtn').click();
+        if (e.key.toLowerCase() === 'a') $('#againBtn').click();
+    }
+
+    // Pintasan untuk menu Kuis
+    if (!views.quizView.classList.contains('hidden')) {
+        if (e.key === 'ArrowRight') $('#nextQBtn').click();
+        if (e.key === 'ArrowLeft') $('#prevQBtn').click();
+    }
+});
+
+// ===== Seed & Boot =====
+function seedIfEmpty() {
+    if (cards.length) return;
+    cards = [{
+        id: uid(),
+        hanzi: '你好',
+        pinyin: 'nǐ hǎo',
+        arti: 'halo',
+        stats: {
+            good: 0,
+            again: 0
+        }
+    }, {
+        id: uid(),
+        hanzi: '谢谢',
+        pinyin: 'xièxie',
+        arti: 'terima kasih',
+        stats: {
+            good: 0,
+            again: 0
+        }
+    }, {
+        id: uid(),
+        hanzi: '学习',
+        pinyin: 'xuéxí',
+        arti: 'belajar',
+        stats: {
+            good: 0,
+            again: 0
+        }
+    }, {
+        id: uid(),
+        hanzi: '喝水',
+        pinyin: 'hē shuǐ',
+        arti: 'minum air',
+        stats: {
+            good: 0,
+            again: 0
+        }
+    }, {
+        id: uid(),
+        hanzi: '跑步',
+        pinyin: 'pǎobù',
+        arti: 'lari',
+        stats: {
+            good: 0,
+            again: 0
+        }
+    }, ];
+    saveCards(); // Use saveCards
+}
+
+const slideDurationInput = $('#slideDurationInput');
+
+function loadCustomSettings() {
+    const savedDuration = localStorage.getItem('customSlideDuration');
+    if (savedDuration) {
+        customSlideDuration = parseInt(savedDuration, 10);
+        slideDurationInput.value = customSlideDuration;
+    }
+    // Load animation toggle state
+    const savedAnimationState = localStorage.getItem('animationEnabled');
+    if (savedAnimationState !== null) {
+        animationToggle.checked = JSON.parse(savedAnimationState);
+    }
+    updateAnimationState(); // Update UI based on loaded state
+}
+
+function saveCustomSettings() {
+    localStorage.setItem('customSlideDuration', customSlideDuration.toString());
+    localStorage.setItem('animationEnabled', JSON.stringify(animationToggle.checked));
+}
+
+slideDurationInput.addEventListener('input', () => {
+    const value = parseInt(slideDurationInput.value, 10);
+    if (!isNaN(value) && value >= 100 && value <= 1000) {
+        customSlideDuration = value;
+        saveCustomSettings();
+    }
+});
+
+// ===== Account UI Rendering =====
+function renderAccountUI() {
+    $('#userPfp').src = userAccount.pfp || 'https://placehold.co/100x100/cccccc/000000?text=👤';
+     $('#accountDescription').textContent = userAccount.description || "Write your description here.";
+    $('#accountUsername').textContent = userAccount.username;
+    $('#accountLevel').textContent = userAccount.level;
+    $('#usersLevel').textContent = userAccount.level;
+    $('#user-level').value = userAccount.level;
+    
+    // Calculate XP for current level and next level
+    const xpForNextLevelThreshold = getTotalXpForNextLevelThreshold(userAccount.level);
+    
+    let displayXpNeededForNextLevel = xpForNextLevelThreshold - userAccount.xp;
+    if (userAccount.level >= xpThresholds.length) { // If max level
+        displayXpNeededForNextLevel = "MAX";
+    } else {
+        displayXpNeededForNextLevel = Math.max(0, xpForNextLevelThreshold - userAccount.xp); // Ensure not negative if XP is already past threshold
+    }
+
+    $('#accountXP').textContent = `${userAccount.xp} / ${xpForNextLevelThreshold === Infinity ? 'MAX' : xpForNextLevelThreshold}`;
+    $('#accountNextLevelXP').textContent = `${displayXpNeededForNextLevel} XP to next level`;
+    
+    if (userAccount.rank === "Bronze") {
+    $('#accountRank').textContent = "🛡️Bronze";
+    } else if (userAccount.rank === "Silver") {
+    $('#accountRank').textContent = "🥈Silver";
+    } else if (userAccount.rank === "Gold") {
+    $('#accountRank').textContent = "🥇𝙂𝙤𝙡𝙙";
+    } else if (userAccount.rank === "Crystal") {
+    $('#accountRank').textContent = "🔷𝐂𝐫𝐲𝐬𝐭𝐚𝐥";
+    } else if (userAccount.rank === "Platinum") {
+    $('#accountRank').textContent = "✨𝗣𝗹𝗮𝘁𝗶𝗻𝘂𝗺";
+    } else if (userAccount.rank === "Sapphire") {
+    $('#accountRank').textContent = "💠𝗦𝗮𝗽𝗽𝗵𝗶𝗿𝗲";
+    } else if (userAccount.rank === "Diamond") {
+    $('#accountRank').textContent = "💎𝔻𝕚𝕒𝕞𝕠𝕟𝕕";
+    } else if (userAccount.rank === "Obsidian") {
+    $('#accountRank').textContent = "🪨▀▄ Obsidian ▄▀";
+    } else if (userAccount.rank === "Titanium") {
+    $('#accountRank').textContent = "⚙️ƬIƬΛПIЦM";
+    } else if (userAccount.rank === "Mythic") {
+    $('#accountRank').textContent = "🌟Ｍｙｔｈｉｃ";
+    } else if (userAccount.rank === "Master") {
+    $('#accountRank').textContent = "👑Ｍａｓｔｅｒ";
+    } else if (userAccount.rank === "Immortal") {
+    $('#accountRank').textContent = "♾️𝙸𝚖𝚖𝚘𝚛𝚝𝚊𝚕";
+    } else if (userAccount.rank === "Phoenix") {
+    $('#accountRank').textContent = "🦅𝒫𝒽𝑜𝑒𝓃𝒾𝓍";
+    } else if (userAccount.rank === "Griffin") {
+    $('#accountRank').textContent = "🦄gяιƒƒιη";
+    } else if (userAccount.rank === "Celestial") {
+    $('#accountRank').textContent = "☄️𝙲𝚎𝚕𝚎𝚜𝚝𝚒𝚊𝚕";
+    } else if (userAccount.rank === "Dragon") {
+    $('#accountRank').textContent = "🐉DЯΛGӨП";
+    } else if (userAccount.rank === "Legend") {
+    $('#accountRank').textContent = "🔥【Ｌｅｇｅｎｄ】";
+    } else if (userAccount.rank === "Eternal") {
+    $('#accountRank').textContent = "🌙»»Eternal»»";
+    } else if (userAccount.rank === "Amethyst") {
+    $('#accountRank').textContent = "🔮ᗩᗰETᕼYᔕT";
+    } else if (userAccount.rank === "Cosmic") {
+    $('#accountRank').textContent = "🌠Ｃｏｓｍｉｃ";
+    } else if (userAccount.rank === "Monarch") {
+    $('#accountRank').textContent = "🌌+= 爪ㄖ几卂尺匚卄 =+👑";
+    } else if (userAccount.rank === "Stellar") {
+      $('#accountRank').textContent = "⭐『Sｔｅｌｌａｒ』";
+    } else if (userAccount.rank === "Radiant") {
+      $('#accountRank').textContent = "🔆«•Ｒａｄｉａｎｔ•»";
+    } else if (userAccount.rank === "Divine") {
+      $('#accountRank').textContent = "✨《D•i•v•i•n•e》✨";
+    } else if (userAccount.rank === "Aether") {
+      $('#accountRank').textContent = "🌬️彡A E T H E R彡";
+    } else if (userAccount.rank === "Zenith") {
+      $('#accountRank').textContent = "🎯【Z E N I T H】🎯";
+    } else if (userAccount.rank === "Absolute") {
+      $('#accountRank').textContent = "⚜️༺Aʙsᴏʟᴜᴛᴇ༻⚜️";
+    } else {
+    $('#accountRank').textContent = userAccount.rank;
+    }
+
+
+    $('#statsCardsStudied').textContent = userAccount.stats.cardsStudied;
+    $('#statsGoodAnswers').textContent = userAccount.stats.goodAnswers;
+    $('#statsAgainAnswers').textContent = userAccount.stats.againAnswers;
+    $('#statsTotalQuizzes').textContent = userAccount.stats.totalQuizzes;
+    $('#statsCorrectAnswers').textContent = userAccount.stats.correctAnswers;
+    $('#statsWrongAnswers').textContent = userAccount.stats.wrongAnswers;
+    $('#statsAccuracy').textContent = `${userAccount.stats.accuracy.toFixed(0)}%`;
+}
+
+// ===== Account Management Handlers =====
+$('#changeUsernameBtn').addEventListener('click', async () => {
+    const newUsername = await customPrompt('Masukkan nama pengguna baru:', userAccount.username);
+    if (newUsername !== null && newUsername.trim() !== '') {
+        userAccount.username = newUsername.trim();
+        saveAccountData();
+        await customAlert('Nama pengguna berhasil diubah!');
+    } else if (newUsername === '') {
+        await customAlert('Nama pengguna tidak boleh kosong.');
+    }
+});
+
+$('#hideButtonsBtn').addEventListener('click', () => {
+    const accountButtons = $('#accountButtons');
+    const eyeIcon = $('#hideButtonsBtn'); // Mengambil tombol itu sendiri
+
+    // 1. Menggunakan .toggle() untuk menambah/menghapus kelas 'hidden'
+    accountButtons.classList.toggle('hidden');
+});
+
+$('#changeDescriptionBtn').addEventListener('click', async () => {
+    const newDescription = await customPrompt('Masukkan deskripsi baru:', userAccount.description);
+    if (newDescription !== null) {
+        userAccount.description = newDescription.trim();
+        saveAccountData();
+        await customAlert('Deskripsi berhasil diubah!');
+    }
+});
+
+$('#changePfpBtn').addEventListener('click', async () => {
+    const newPfp = await customPrompt('Masukkan URL gambar profil baru (kosongkan untuk avatar default):', userAccount.pfp);
+    if (newPfp !== null) {
+        userAccount.pfp = newPfp.trim();
+        saveAccountData();
+        await customAlert('Avatar berhasil diubah!');
+    }
+});
+
+$('#exportAccountBtn').addEventListener('click', async () => {
+    let name = await customPrompt('Masukkan nama file untuk export akun:', `flashcard_account_${userAccount.username}`);
+    if (name === null) {
+        return;
+    }
+    name = name.trim();
+    if (!name) {
+        await customAlert('Nama file tidak boleh kosong.');
+        return;
+    }
+    if (!name.toLowerCase().endsWith('.json')) {
+        name = name + '.json';
+    }
+    try {
+        const blob = new Blob([JSON.stringify(userAccount, null, 2)], {
+            type: 'application/json'
+        });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = name;
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+        await customAlert('Akun berhasil diekspor!');
+    } catch (err) {
+        await customAlert('Gagal mengekspor akun: ' + (err && err.message ? err.message : err));
+    }
+});
+
+$('#importAccountInput').addEventListener('change', async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const text = await file.text();
+    try {
+        const importedData = JSON.parse(text);
+        let isValid = true;
+        
+        // Basic validation: Check for essential fields
+        if (!importedData || typeof importedData.username !== 'string' || typeof importedData.level !== 'number' || typeof importedData.xp !== 'number' || typeof importedData.rank !== 'string' || typeof importedData.stats !== 'object') {
+            isValid = false;
+        }
+
+        if (isValid) {
+            // Merge with default to fill in any missing or new fields
+            const tempAccount = { ...defaultAccount, ...importedData };
+            tempAccount.stats = { ...defaultAccount.stats, ...importedData.stats };
+
+            // Further validate stats to ensure they are numbers
+            for (const key in tempAccount.stats) {
+                if (typeof tempAccount.stats[key] !== 'number' || tempAccount.stats[key] < 0) {
+                    tempAccount.stats[key] = defaultAccount.stats[key];
+                }
+            }
+
+            // Recalculate accuracy, level, and rank for imported account to ensure consistency
+            const totalAttemptedQuizQuestions = tempAccount.stats.correctAnswers + tempAccount.stats.wrongAnswers;
+            if (totalAttemptedQuizQuestions > 0) {
+                tempAccount.stats.accuracy = (tempAccount.stats.correctAnswers / totalAttemptedQuizQuestions) * 100;
+            } else {
+                tempAccount.stats.accuracy = 0;
+            }
+            const validatedAccount = calculateRankAndLevel(tempAccount);
+
+            userAccount = validatedAccount;
+            saveAccountData();
+            await customAlert(`Akun "${userAccount.username}" berhasil diimpor!`);
+            renderAccountUI();
+        } else {
+            await customAlert('Data akun yang diimpor tidak valid atau tidak lengkap. Pastikan file JSON memiliki struktur akun yang benar.');
+        }
+    } catch (err) {
+        await customAlert('Gagal import akun: ' + err.message);
+    }
+    e.target.value = ''; // Clear the input so the same file can be selected again
+});
+
+$('#resetAccountBtn').addEventListener('click', async () => {
+    const confirmationPhrase = "12345abcdRESET"; // Frasa yang harus diketik user
+
+    // Langkah 1: Konfirmasi awal (alert)
+    if (await customConfirm('Yakin ingin mereset akun Anda? Ini akan menghapus semua progres akun (XP, Level, Statistik) dan membuat akun baru. Tindakan ini tidak dapat dibatalkan.')) {
+        // Langkah 2: Konfirmasi dengan modal input
+        const userInput = await customPrompt(
+            `Untuk mengonfirmasi reset akun, ketikkan frasa berikut: "${confirmationPhrase}" (tanpa tanda kutip)`,
+            '', // Nilai default kosong
+            'Konfirmasi Reset Akun Permanen' // Judul modal
+        );
+
+        if (userInput === confirmationPhrase) {
+            // Frasa benar, reset akun
+            userAccount = { ...defaultAccount }; // Reset ke default
+            saveAccountData();
+            await customAlert('Akun berhasil direset!');
+            renderAccountUI();
+        } else if (userInput !== null) { // Jika user mengetikkan sesuatu tapi salah
+            await customAlert('Frasa konfirmasi salah. Reset akun dibatalkan.');
+        } else { // Jika user menekan 'Batal' di prompt
+            await customAlert('Reset akun dibatalkan.');
+        }
+    } else { // Jika user menekan 'Tidak' di konfirmasi awal
+        await customAlert('Reset akun dibatalkan.');
+    }
+});
+
+
+// Initial load
+loadCards(); // Load flashcards
+loadAccountData(); // Load user account
+loadCustomSettings(); // ⭐ PANGGIL UNTUK MEMUAT PENGATURAN KUSTOM
+seedIfEmpty(); // Seed cards if empty (after loading existing)
+buildStudyOrder();
+renderList();
+refreshStudyMeta();
+renderAccountUI(); // Render account UI for the first time
+setView('studyView');
+
+document.addEventListener('DOMContentLoaded', () => {
+    const ranksTiers = [
+    { level: 1, name: "Bronze", icon: "🛡️", style: "bronze" },
+    { level: 5, name: "Silver", icon: "🥈", style: "silver" },
+    { level: 10, name: "Gold", icon: "🥇", style: "gold" },
+    { level: 15, name: "Crystal", icon: "🔷", style: "crystal" },
+    { level: 20, name: "Platinum", icon: "✨", style: "platinum" },
+    { level: 25, name: "Sapphire", icon: "💠", style: "sapphire" },
+    { level: 30, name: "Diamond", icon: "💎", style: "diamond" },
+    { level: 35, name: "Obsidian", icon: "🪨", style: "obsidian" },
+    { level: 40, name: "Titanium", icon: "⚙️", style: "titanium" },
+    { level: 45, name: "Mythic", icon: "🌟", style: "mythic" },
+    { level: 50, name: "Master", icon: "👑", style: "master" },
+    { level: 55, name: "Immortal", icon: "♾️", style: "immortal" },
+    { level: 60, name: "Phoenix", icon: "🦅", style: "phoenix" },
+    { level: 65, name: "Griffin", icon: "🦄", style: "griffin" },
+    { level: 70, name: "Celestial", icon: "☄️", style: "celestial" },
+    { level: 75, name: "Dragon", icon: "🐉", style: "dragon" },
+    { level: 80, name: "Legend", icon: "🔥", style: "legend" },
+    { level: 85, name: "Eternal", icon: "🌙", style: "eternal" },
+    { level: 90, name: "Amethyst", icon: "🔮", style: "amethyst" },
+    { level: 95, name: "Cosmic", icon: "🌠", style: "cosmic" },
+    { level: 100, name: "Monarch", icon: "🌌", style: "monarch" },
+    { level: 110, name: "Stellar", icon: "⭐", style: "stellar" },
+    { level: 120, name: "Radiant", icon: "🔆", style: "radiant" },
+    { level: 130, name: "Divine", icon: "🔱", style: "divine" },
+    { level: 140, name: "Aether", icon: "🌬️", style: "aether" },
+    { level: 150, name: "Zenith", icon: "💫", style: "zenith" },
+    { level: 160, name: "Absolute", icon: "⚜️", style: "Absolute" },
+    ];
+
+    const rankContainer = document.getElementById('rank-container');
+    const userLevelInput = document.getElementById('user-level');
+
+    function createRankCard(tier) {
+        const card = document.createElement('div');
+        card.classList.add('tier-card', tier.style);
+        card.dataset.level = tier.level;
+
+        const icon = document.createElement('div');
+        icon.classList.add('tier-icon');
+        icon.textContent = tier.icon;
+        
+        const name = document.createElement('h3');
+        name.classList.add('rank-name');
+        name.textContent = tier.name;
+
+        const level = document.createElement('p');
+        level.classList.add('level');
+        level.textContent = `Level ${tier.level}+`;
+
+        card.appendChild(icon);
+        card.appendChild(name);
+        card.appendChild(level);
+
+        return card;
+    }
+    
+    // Generate all rank cards on initial load
+    ranksTiers.forEach(tier => {
+        const card = createRankCard(tier);
+        rankContainer.appendChild(card);
+    });
+
+    function updateRankDisplay(userLevel) {
+        const cards = document.querySelectorAll('.tier-card');
+        let currentRankFound = false;
+        let activeCard = null;
+
+        // Find the current rank by iterating from the highest level down
+        for (let i = ranksTiers.length - 1; i >= 0; i--) {
+            if (userLevel >= ranksTiers[i].level) {
+                activeCard = document.querySelector(`.tier-card.${ranksTiers[i].style}`);
+                break;
+            }
+        }
+
+        cards.forEach(card => {
+            card.classList.remove('active');
+        });
+
+        if (activeCard) {
+            activeCard.classList.add('active');
+        }
+    }
+    
+    // Update display whenever the user level changes
+    userLevelInput.addEventListener('input', () => {
+        const userLevel = parseInt(userLevelInput.value, 10);
+        updateRankDisplay(userLevel);
+    });
+
+    // Initial display on page load with default value
+    updateRankDisplay(parseInt(userLevelInput.value, 10));
+});
+
+</script>
+</body>
+</html>
