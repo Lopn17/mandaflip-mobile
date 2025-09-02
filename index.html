@@ -112,6 +112,7 @@ option{color: #0a0d1a;}
 .search input{flex:1}
 .count{font-size:.9rem;color:var(--muted)}
 .table-wrapper {
+    padding: 5px;
     max-height: 50vh;
     overflow: auto;
     overflow-anchor: none;
@@ -1767,14 +1768,29 @@ function showQuestionAt(index) {
 
     if (item.answered) {
         const feedbackText = `Jawaban: <span style="font-weight:600;color:var(--text)">${item.hanzi} / ${item.pinyin} / ${item.arti}</span>`;
+
+        // Buat string HTML untuk tombol suara
+        // Kita akan memutar suara dari Hanzi atau prompt, tergantung mode kuis
+        const textToSpeak = (quizSession.mode.includes('hanzi')) ? item.hanzi : prompt;
+        const speakBtnHtml = `<button class="tab speak-btn-quiz" style="margin-left: 8px;" data-hanzi="${textToSpeak}">🔊</button>`;
+
         if (item.chosen === correct) {
-            quizFeedback.innerHTML = `Benar! <br>${feedbackText}`;
+            quizFeedback.innerHTML = "Benar! " + `<br>` + feedbackText + speakBtnHtml;
         } else {
-            quizFeedback.innerHTML = `Salah. Jawaban yang benar adalah: ${correct}<br>${feedbackText}`;
+            quizFeedback.innerHTML = `Salah. Jawaban yang benar adalah: ${correct}` + `<br>` + feedbackText + speakBtnHtml;
         }
         nextQBtn.disabled = false;
     } else {
+        quizFeedback.textContent = '';
         nextQBtn.disabled = true;
+    }
+
+    const quizSpeakBtn = document.querySelector('.speak-btn-quiz');
+    if (quizSpeakBtn) { // Pastikan tombol ada sebelum menambahkan listener
+        quizSpeakBtn.addEventListener('click', (e) => {
+            const textToSpeak = e.currentTarget.dataset.hanzi;
+            speak(textToSpeak); // Gunakan fungsi speak() yang sudah ada
+        });
     }
 
     const choicesToDisplay = item.choices || buildAndStoreChoices(item, correct, field);
