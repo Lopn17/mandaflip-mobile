@@ -341,54 +341,6 @@ tr td:last-child,tr th:last-child{border-top-right-radius:12px;border-bottom-rig
     font-size:14px;
 }
 
-.search-wrapper {
-  position: relative;
-  display: inline-block;
-  width: 100%; /* biar fleksibel */
-  max-width: 300px; /* optional */
-}
-
-#searchChoices {
-  width: 100%;
-  padding: 8px 40px 8px 12px; /* tambahin right padding biar ga ketimpa tombol */
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background-color: var(--card-bg);
-  color: var(--text-color);
-  font-size: 1rem;
-  box-sizing: border-box;
-}
-
-#searchChoices::placeholder {
-  color: var(--muted);
-}
-
-#clearSearchBtn {
-  position: absolute;
-  right: 8px;
-  top: 50%;
-  transform: translateY(-50%);
-  border: none;
-  background: var(--card-bg);
-  color: var(--text-color);
-  font-size: 0.9rem;
-  cursor: pointer;
-  padding: 4px 8px;
-  border-radius: 6px;
-}
-
-#clearSearchBtn:hover {
-  background: var(--border);
-}
-
-.header-container {
-  display: flex;
-  justify-content: flex-end; /* Ini yang membuat elemen di dalamnya ke kanan */
-  width: 100%; /* Penting agar efeknya terlihat */
-  margin-bottom: 10px; /* Tambahkan sedikit jarak di bawah */
-}
-
-
 .q-stem{font-size:1.4rem}
 .choices{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 @media (max-width:700px){.choices{grid-template-columns:1fr}}
@@ -842,11 +794,6 @@ input:checked + .toggle-slider:before {transform: translateX(16px);background-co
         <div id="qNumber" style="font-size:0.9rem;color:var(--muted);margin-bottom:8px"></div>
         <div id="quizStats" style="font-size:0.9rem;color:var(--muted);margin-bottom:8px">Benar: 0 · Salah: 0 · 0% · 0xp</div>
         </div>
-          <div class="header-container"> <div class="search-wrapper">
-                <input type="text" id="searchChoices" placeholder="Cari jawaban...">
-                <button id="clearSearchBtn" class="tab">Hapus</button>
-                </div>
-            </div>
         <div class="q-stem" id="qStem">—</div>
         <div class="table-wrapper" style="margin-top: 10px;">
             <div class="choices" id="qChoices"></div>
@@ -998,117 +945,6 @@ input:checked + .toggle-slider:before {transform: translateX(16px);background-co
 </div>
 </div>
 <script>
-
-document.addEventListener('DOMContentLoaded', function() {
-  const qChoices = document.getElementById('qChoices');
-  const searchInput = document.getElementById('searchChoices');
-  const clearSearchBtn = document.getElementById('clearSearchBtn');
-
-  let originalChoices = Array.from(qChoices.children);
-  let suppressObserver = false;
-
-  // Render dengan opsi highlight
-  function renderChoices(nodes, searchTerm = '') {
-    suppressObserver = true;
-    qChoices.innerHTML = '';
-
-    if (nodes.length === 0) {
-      const noResult = document.createElement('li');
-      noResult.textContent = 'No results found';
-      noResult.classList.add('no-result'); // bisa kamu style di CSS
-      qChoices.appendChild(noResult);
-      suppressObserver = false;
-      return;
-    }
-
-    const frag = document.createDocumentFragment();
-    nodes.forEach(node => {
-      const clone = node.cloneNode(true);
-      if (searchTerm) {
-        highlightText(clone, searchTerm);
-      }
-      frag.appendChild(clone);
-    });
-
-    qChoices.appendChild(frag);
-    suppressObserver = false;
-  }
-
-  // Highlight kata yang dicari
-  function highlightText(element, term) {
-    const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT, null, false);
-    const regex = new RegExp(`(${term})`, 'gi');
-    let node;
-    const textNodes = [];
-
-    while ((node = walker.nextNode())) {
-      if (regex.test(node.textContent)) {
-        textNodes.push(node);
-      }
-    }
-
-    textNodes.forEach(textNode => {
-      const span = document.createElement('span');
-      span.innerHTML = textNode.textContent.replace(regex, '<mark>$1</mark>');
-      textNode.parentNode.replaceChild(span, textNode);
-    });
-  }
-
-  // Event search
-  searchInput.addEventListener('input', function() {
-    const term = searchInput.value.trim().toLowerCase();
-
-    if (term === '') {
-      renderChoices(originalChoices);
-      return;
-    }
-
-    const filtered = originalChoices.filter(node =>
-      node.textContent.toLowerCase().includes(term)
-    );
-
-    renderChoices(filtered, term);
-  });
-
-  // Clear button
-  clearSearchBtn?.addEventListener('click', function() {
-    searchInput.value = '';
-    renderChoices(originalChoices);
-    searchInput.focus();
-  });
-
-  // Observer untuk update originalChoices kalau ada perubahan eksternal
-  const observer = new MutationObserver(mutations => {
-    if (suppressObserver) return;
-
-    const addedToQ = mutations.some(m =>
-      m.type === 'childList' &&
-      m.target === qChoices &&
-      m.addedNodes.length > 0
-    );
-
-    if (addedToQ && searchInput.value.trim() === '') {
-      originalChoices = Array.from(qChoices.children);
-    }
-  });
-
-  observer.observe(qChoices, { childList: true });
-
-  // Init awal
-  if (qChoices.children.length > 0) {
-    originalChoices = Array.from(qChoices.children);
-  }
-});
-
-document.addEventListener('keydown', function(e) {
-  // Deteksi Ctrl + /
-  if (e.ctrlKey && e.key === '/') {
-    e.preventDefault(); // cegah default browser (biasanya quick find)
-    const searchInput = document.getElementById('searchChoices');
-    searchInput.focus();
-    searchInput.select(); // biar teks lama langsung terseleksi
-  }
-});
 
 function speak(text) {
     if ('speechSynthesis' in window) {
