@@ -1779,6 +1779,9 @@ function showQuestionAt(index) {
             quizFeedback.innerHTML = "Benar! " + `<br>` + feedbackText + speakBtnHtml;
         } else {
             quizFeedback.innerHTML = `Salah. Jawaban yang benar adalah: ${correct}` + `<br>` + feedbackText + speakBtnHtml;
+            if (quizSession.mode === 'sound-arti' || quizSession.mode === 'arti-sound'){
+                quizFeedback.innerHTML = `Salah. Jawaban yang benar adalah: ${correct}` + `<br>` + feedbackText;
+            }
         }
         nextQBtn.disabled = false;
     } else {
