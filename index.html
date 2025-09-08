@@ -1772,16 +1772,13 @@ function showQuestionAt(index) {
 
         // Buat string HTML untuk tombol suara
         // Kita akan memutar suara dari Hanzi atau prompt, tergantung mode kuis
-        const textToSpeak = (quizSession.mode.includes('hanzi')) ? item.hanzi : prompt;
-        const speakBtnHtml = `<button class="tab speak-btn-quiz" style="margin-left: 8px;" data-hanzi="${textToSpeak}">🔊</button>`;
+        const textToSpeak = item.hanzi;
+        const speakBtnHtml = `<button class="tab speak-btn-quiz" style="margin-left: 8px;" data-hanzi="${item.hanzi}">🔊</button>`;
 
         if (item.chosen === correct) {
             quizFeedback.innerHTML = "Benar! " + `<br>` + feedbackText + speakBtnHtml;
         } else {
             quizFeedback.innerHTML = `Salah. Jawaban yang benar adalah: ${correct}` + `<br>` + feedbackText + speakBtnHtml;
-            if (quizSession.mode === 'sound-arti' || quizSession.mode === 'arti-sound'){
-                quizFeedback.innerHTML = `Salah. Jawaban yang benar adalah: ${correct}` + `<br>` + feedbackText;
-            }
         }
         nextQBtn.disabled = false;
     } else {
