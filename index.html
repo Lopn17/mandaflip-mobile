@@ -966,7 +966,7 @@ const speakBtn = document.getElementById('speakBtn');
 speakBtn.addEventListener('click', () => {
     // Dapatkan Hanzi yang sedang ditampilkan.
     // Asumsi Hanzi ditampilkan di elemen dengan ID 'frontText'
-    const hanziToSpeak = document.getElementById('frontText').textContent.trim();
+    const hanziToSpeak = document.getElementById('backHanzi').textContent.trim();
     if (hanziToSpeak && hanziToSpeak !== '—') {
         speak(hanziToSpeak);
     }
@@ -1699,7 +1699,7 @@ async function endQuiz() {
 function showNextQuestion() {
     if (!quizSession) return;
     if (quizSession.idx >= quizSession.pool.length - 1) {
-        endQuiz();
+        $('#endQuizBtn').click();
         return;
     }
     quizSession.idx++;
@@ -1866,11 +1866,11 @@ function updateQuizStatsUI() {
 
     if (totalChoices >= 2 && totalChoices <= 4) {
         expMultiplier = 5;
-    } else if (totalChoices >= 6 && totalChoices <= 10) {
+    } else if (totalChoices >= 6 && totalChoices <= 8) {
         expMultiplier = 10;
-    } else if (totalChoices >= 12 && totalChoices <= 20) {
+    } else if (totalChoices >= 10 && totalChoices <= 16) {
         expMultiplier = 15;
-    } else if (totalChoices >= 24 && totalChoices <= 30) {
+    } else if (totalChoices >= 20 && totalChoices <= 30) {
         expMultiplier = 20;
     } else if (totalChoices >= 40 && totalChoices <= 50) {
         expMultiplier = 25;
@@ -1879,6 +1879,7 @@ function updateQuizStatsUI() {
     } else {
         expMultiplier = 0;
     }
+    
     const expGained = quizSession.correctCount * expMultiplier;
     const correct = quizSession.correctCount || 0;
     const wrong = quizSession.wrongCount || 0;
@@ -2048,11 +2049,11 @@ function updateAccountOnQuizCompletion(quizResults, totalChoices) {
 
     if (totalChoices >= 2 && totalChoices <= 4) {
         xpMultiplier = 5;
-    } else if (totalChoices >= 6 && totalChoices <= 10) {
+    } else if (totalChoices >= 6 && totalChoices <= 8) {
         xpMultiplier = 10;
-    } else if (totalChoices >= 12 && totalChoices <= 20) {
+    } else if (totalChoices >= 10 && totalChoices <= 16) {
         xpMultiplier = 15;
-    } else if (totalChoices >= 24 && totalChoices <= 30) {
+    } else if (totalChoices >= 20 && totalChoices <= 30) {
         xpMultiplier = 20;
     } else if (totalChoices >= 40 && totalChoices <= 50) {
         xpMultiplier = 25;
@@ -2061,7 +2062,6 @@ function updateAccountOnQuizCompletion(quizResults, totalChoices) {
     } else {
         xpMultiplier = 0;
     }
-    
     // Hitung XP yang didapat menggunakan pengali yang sudah ditentukan
     const xpGained = quizResults.correct * xpMultiplier;
     userAccount.xp += xpGained;
@@ -2319,17 +2319,20 @@ function showOnCard(card) {
         frontText.textContent = card.hanzi;
         backPinyin.textContent = card.pinyin;
         backArti.textContent = card.arti;
-        backHanzi.textContent = '';
+        backHanzi.textContent = card.hanzi;
+        backHanzi.style.display = 'none';
     } else if (studyMode === 'pinyin') {
         frontText.textContent = card.pinyin;
         backPinyin.textContent = card.arti;
         backArti.textContent = card.hanzi;
-        backHanzi.textContent = '';
+        backHanzi.textContent = card.hanzi;
+        backHanzi.style.display = 'none';
     } else if (studyMode === 'arti') {
         frontText.textContent = card.arti;
         backPinyin.textContent = card.pinyin;
         backArti.textContent = card.hanzi;
-        backHanzi.textContent = '';
+        backHanzi.textContent = card.hanzi;
+        backHanzi.style.display = 'none';
     }
     studyCard.classList.toggle('flipped', flipped);
     studyCardInner.classList.remove('is-again', 'is-good');
