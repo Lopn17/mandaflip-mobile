@@ -659,6 +659,46 @@ input:checked + .toggle-slider:before {transform: translateX(16px);background-co
 }
 .mode-tabs::-webkit-scrollbar, .filter-tabs::-webkit-scrollbar { display: none; }
 
+.notification {
+  background: #333;
+  color: #fff;
+  padding: 10px 14px;
+  margin-top: 8px;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  animation: fadeIn 0.3s ease;
+  position: relative;
+  min-width: 200px;
+  max-width: 280px;
+}
+
+.notification.info { background: #3498db; }
+.notification.success { background: #2ecc71; }
+.notification.error { background: #e74c3c; }
+.notification.warning { background: #f39c12; }
+
+.notification .close-btn {
+  margin-left: auto;
+  margin-right: -6px;
+  margin-top: -2px;
+  cursor: pointer;
+  font-weight: bold;
+  padding: 0 6px;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateX(-10px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; transform: translateX(0); }
+  to { opacity: 0; transform: translateX(-10px); }
+}
+
 </style>
 </head>
 <body>
@@ -953,6 +993,7 @@ input:checked + .toggle-slider:before {transform: translateX(16px);background-co
     </div>
 </section>
 </div>
+<div id="notificationContainer" style="position: fixed; top: 10px; left: 10px; z-index: 9999;"></div>
 <div id="customModal" class="modal-overlay hidden">
 <div class="modal-content">
 <div class="modal-header">
@@ -1340,6 +1381,34 @@ const rankTiers = [
 
 
 // ===== CUSTOM MODAL FUNCTIONS =====
+function showNotification(message, type = 'info') {
+    const container = $('#notificationContainer');
+
+    const notif = document.createElement('div');
+    notif.className = `notification ${type}`;
+    notif.innerHTML = `
+        <span>${message}</span>
+        <span class="close-btn">&times;</span>
+    `;
+
+    container.appendChild(notif);
+
+    // Tutup manual (klik silang)
+    notif.querySelector('.close-btn').addEventListener('click', () => {
+        notif.style.animation = "fadeOut 0.3s ease forwards";
+        setTimeout(() => notif.remove(), 300);
+    });
+
+    // Auto ilang setelah 3 detik
+    setTimeout(() => {
+        if (document.body.contains(notif)) {
+            notif.style.animation = "fadeOut 0.3s ease forwards";
+            setTimeout(() => notif.remove(), 300);
+        }
+    }, 5000);
+}
+
+
 function customAlert(message) {
     return new Promise(resolve => {
         const modal = $('#customModal');
@@ -1827,11 +1896,12 @@ function showQuestionAt(index) {
         // Tombol Again & Good
         const againBtnHtml = `<button class="tab again-btn-quiz" style="margin-left: 8px;" data-id="${item.id}">Again</button>`;
         const goodBtnHtml  = `<button class="tab good-btn-quiz" style="margin-left: 8px;" data-id="${item.id}">Good</button>`;
+        const notyetBtnHtml  = `<button class="tab notyet-btn-quiz" style="margin-left: 8px;" data-id="${item.id}">Coba Lagi</button>`;
 
         if (item.chosen === correct) {
-            quizFeedback.innerHTML = "Benar! <br>" + feedbackText + speakBtnHtml + againBtnHtml + goodBtnHtml;
+            quizFeedback.innerHTML = "Benar! <br>" + feedbackText + speakBtnHtml + notyetBtnHtml + againBtnHtml + goodBtnHtml;
         } else {
-            quizFeedback.innerHTML = `Salah. Jawaban yang benar adalah: ${correct}<br>` + feedbackText + speakBtnHtml + againBtnHtml + goodBtnHtml;
+            quizFeedback.innerHTML = `Salah. Jawaban yang benar adalah: ${correct}<br>` + feedbackText + speakBtnHtml + notyetBtnHtml + againBtnHtml + goodBtnHtml;
         }
         nextQBtn.disabled = false;
     } else {
@@ -1860,7 +1930,7 @@ function showQuestionAt(index) {
             today.again++;
             saveCards();
             updateAccountOnStudy('again');
-            customAlert(`Kartu ${c.hanzi} / ${c.pinyin} / ${c.arti} ditandai "Again"`);
+            showNotification(`Kartu "${c.hanzi} / ${c.pinyin} / ${c.arti}" ditandai "Again"`, "info");
         });
     }
 
@@ -1876,7 +1946,22 @@ function showQuestionAt(index) {
             today.good++;
             saveCards();
             updateAccountOnStudy('good');
-            customAlert(`Kartu ${c.hanzi} / ${c.pinyin} / ${c.arti} ditandai "Good"`);
+            showNotification(`Kartu ${c.hanzi} / ${c.pinyin} / ${c.arti} ditandai "Good"`, "info");
+        });
+    }
+
+        // Event tombol Good di quiz feedback
+    const quizNotyetBtn = document.querySelector('.notyet-btn-quiz');
+    if (quizNotyetBtn) {
+        quizNotyetBtn.addEventListener('click', (e) => {
+            const id = e.currentTarget.dataset.id;
+            const c = cards.find(cc => cc.id == id);
+            if (!c) return;
+            c.status = undefined;
+            saveCards();
+            buildStudyOrder();
+            showNotification(`Kartu ${c.hanzi} / ${c.pinyin} / ${c.arti} ditandai "Belum Dicoba"`, "info");
+
         });
     }
 
@@ -2226,7 +2311,7 @@ function attachListActionEvents() {
             saveCards();
             buildStudyOrder();
             refreshStudyMeta();
-            customAlert(`Kartu ${c.hanzi} direset ke "Belum Dicoba"`);
+            showNotification(`Kartu ${c.hanzi} / ${c.pinyin} / ${c.arti} direset ke "Belum Dicoba"`, "info");
             renderList(); // refresh tampilan
         });
     });
@@ -2241,7 +2326,7 @@ function attachListActionEvents() {
             today.again++;
             saveCards();
             updateAccountOnStudy('again');
-            customAlert(`Kartu ${c.hanzi} ditandai "Again"`);
+            showNotification(`Kartu ${c.hanzi} / ${c.pinyin} / ${c.arti} ditandai "Again"`, "info");
             renderList();
         });
     });
@@ -2256,7 +2341,7 @@ function attachListActionEvents() {
             today.good++;
             saveCards();
             updateAccountOnStudy('good');
-            customAlert(`Kartu ${c.hanzi} ditandai "Good"`);
+            showNotification(`Kartu ${c.hanzi} / ${c.pinyin} / ${c.arti} ditandai "Good"`, "info");
             renderList();
         });
     });
