@@ -1899,9 +1899,9 @@ function showQuestionAt(index) {
         const notyetBtnHtml  = `<button class="tab notyet-btn-quiz" style="margin-left: 8px;" data-id="${item.id}">Coba Lagi</button>`;
 
         if (item.chosen === correct) {
-            quizFeedback.innerHTML = "Benar! <br>" + feedbackText + speakBtnHtml + notyetBtnHtml + againBtnHtml + goodBtnHtml;
+            quizFeedback.innerHTML = "Benar! <br>" + feedbackText + speakBtnHtml + againBtnHtml + goodBtnHtml + notyetBtnHtml;
         } else {
-            quizFeedback.innerHTML = `Salah. Jawaban yang benar adalah: ${correct}<br>` + feedbackText + speakBtnHtml + notyetBtnHtml + againBtnHtml + goodBtnHtml;
+            quizFeedback.innerHTML = `Salah. Jawaban yang benar adalah: ${correct}<br>` + feedbackText + speakBtnHtml + againBtnHtml + goodBtnHtml + notyetBtnHtml;
         }
         nextQBtn.disabled = false;
     } else {
@@ -1930,7 +1930,7 @@ function showQuestionAt(index) {
             today.again++;
             saveCards();
             updateAccountOnStudy('again');
-            showNotification(`Kartu "${c.hanzi} / ${c.pinyin} / ${c.arti}" ditandai "Again"`, "info");
+            showNotification(`Kartu "${c.hanzi} / ${c.pinyin} / ${c.arti}" ditandai "Again"`, "error");
         });
     }
 
@@ -1960,8 +1960,7 @@ function showQuestionAt(index) {
             c.status = undefined;
             saveCards();
             buildStudyOrder();
-            showNotification(`Kartu ${c.hanzi} / ${c.pinyin} / ${c.arti} ditandai "Belum Dicoba"`, "info");
-
+            showNotification(`Status kartu ${c.hanzi} / ${c.pinyin} / ${c.arti} direset jadi "Belum Dicoba".`, "warning");
         });
     }
 
@@ -2311,7 +2310,7 @@ function attachListActionEvents() {
             saveCards();
             buildStudyOrder();
             refreshStudyMeta();
-            showNotification(`Kartu ${c.hanzi} / ${c.pinyin} / ${c.arti} direset ke "Belum Dicoba"`, "info");
+            showNotification(`Status kartu ${c.hanzi} / ${c.pinyin} / ${c.arti} direset jadi "Belum Dicoba".`, "warning");
             renderList(); // refresh tampilan
         });
     });
@@ -2326,7 +2325,7 @@ function attachListActionEvents() {
             today.again++;
             saveCards();
             updateAccountOnStudy('again');
-            showNotification(`Kartu ${c.hanzi} / ${c.pinyin} / ${c.arti} ditandai "Again"`, "info");
+            showNotification(`Kartu ${c.hanzi} / ${c.pinyin} / ${c.arti} ditandai "Again"`, "error");
             renderList();
         });
     });
@@ -2755,7 +2754,7 @@ $('#notYetBtn').addEventListener('click', () => {
     refreshStudyMeta();
 
     // Feedback kecil (opsional)
-    customAlert('Status kartu direset jadi "Belum Dicoba".');
+    showNotification(`Status kartu ${c.hanzi} / ${c.pinyin} / ${c.arti} direset jadi "Belum Dicoba".`, "warning");
 });
 
 $('#goodBtn').addEventListener('click', () => {
