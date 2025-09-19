@@ -274,9 +274,14 @@ tr td:last-child,tr th:last-child{border-top-right-radius:12px;border-bottom-rig
     flex-direction: column;
     gap: 12px;
 }
-.nav-controls, .action-controls {
+.nav-controls{
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+}
+.action-controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
     gap: 8px;
 }
 .settings-controls {
@@ -634,8 +639,18 @@ input:checked + .toggle-slider:before {transform: translateX(16px);background-co
 }
 .nav-wrapper::-webkit-scrollbar { display: none; }
 
-.mode-tabs, .filter-tabs {
-    display: flex;
+.mode-tabs{
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 6px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 10px;
+    scrollbar-width: none;
+}
+.filter-tabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
     gap: 6px;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
@@ -703,8 +718,9 @@ input:checked + .toggle-slider:before {transform: translateX(16px);background-co
                 <button id="nextBtn" class="tab">Berikutnya ▶</button>
             </div>
             <div class="action-controls">  
-                <button id="againBtn" class="tab">Again (A)</button>
-                <button id="goodBtn" class="tab">Good (G)</button>
+                <button id="notYetBtn" class="tab">Not Yet</button>
+                <button id="againBtn" class="tab">Again</button>
+                <button id="goodBtn" class="tab">Good</button>
                 <button id="clearStatusBtn" class="tab" style="background:linear-gradient(180deg,#8d4b29,#683a21);">Clear</button>
             </div>
             <div>
@@ -738,6 +754,15 @@ input:checked + .toggle-slider:before {transform: translateX(16px);background-co
     <h2>Kuis Pilihan Ganda</h2>
     <div class="quiz">
         <div class="quiz-settings">
+            <div class="quiz-setting">
+                <label for="contentSel">Isi Soal</label>
+                <select id="contentSel" class="tab">
+                    <option value="all">Semua Kartu</option>
+                    <option value="again">Perlu Dipelajari (Again)</option>
+                    <option value="default">Belum Dicoba</option>
+                    <option value="good">Sudah Dikuasai (Good)</option>
+                </select>
+            </div>
             <div class="quiz-setting">
                 <label for="modeSel">Tipe Soal</label>
                 <select id="modeSel" class="tab">
@@ -1514,6 +1539,7 @@ const quizGrade = $('#quizGrade');
 const xpGain = $('#xpGain');
 const quizFeedback = $('#quizFeedback');
 const numSel = $('#numSel');
+const contentSel = $('#contentSel');
 const cChoicesSel = $('#cChoices'); // Renamed to avoid conflict with qChoices element
 const customWrap = $('#customNumWrap');
 const customNumInput = $('#customNum');
@@ -1582,6 +1608,32 @@ $('#startQuizBtn').addEventListener('click', async () => {
     
     const mode = $('#modeSel').value;
 
+        // === FILTER SESUAI ISI SOAL ===
+    let filteredCards = [];
+    switch (contentSel.value) {
+        case 'again':
+            filteredCards = cards.filter(c => c.status === 'again');
+            break;
+        case 'default':
+            filteredCards = cards.filter(c => !c.status || c.status === 'default');
+            break;
+        case 'good':
+            filteredCards = cards.filter(c => c.status === 'good');
+            break;
+        default: // 'all'
+            filteredCards = [...cards];
+    }
+
+    if (filteredCards.length === 0) {
+        await customAlert('Tidak ada kartu yang sesuai dengan pilihan Isi Soal. Tambahkan atau ubah status kartu di menu Belajar.');
+        return;
+    }
+
+    n = Math.min(n, filteredCards.length);
+
+    const pool = shuffle([...filteredCards]).slice(0, Math.max(1, n));
+
+
     // --- LOGIKA BARU UNTUK MENCEGAH BUG ---
     let fieldToCheck = null;
     let fieldName = '';
@@ -1618,7 +1670,6 @@ $('#startQuizBtn').addEventListener('click', async () => {
     }
     // --- AKHIR DARI LOGIKA BARU ---
 
-    const pool = shuffle([...cards]).slice(0, Math.max(1, n));
     quizSession = {
         mode,
         pool: pool.map(c => ({...c, answered: false, chosen: null, choices: null})),
@@ -2520,6 +2571,20 @@ $('#againBtn').addEventListener('click', () => {
     }
     showFeedbackText('again');
 
+});
+
+$('#notYetBtn').addEventListener('click', () => {
+    const c = current();
+    if (!c) return;
+
+    // Reset status jadi belum dicoba
+    c.status = undefined;
+    saveCards(); 
+    buildStudyOrder();
+    refreshStudyMeta();
+
+    // Feedback kecil (opsional)
+    customAlert('Status kartu direset jadi "Belum Dicoba".');
 });
 
 $('#goodBtn').addEventListener('click', () => {
