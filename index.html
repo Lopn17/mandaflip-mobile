@@ -1821,15 +1821,17 @@ function showQuestionAt(index) {
     if (item.answered) {
         const feedbackText = `Jawaban: <span style="font-weight:600;color:var(--text)">${item.hanzi} / ${item.pinyin} / ${item.arti}</span>`;
 
-        // Buat string HTML untuk tombol suara
-        // Kita akan memutar suara dari Hanzi atau prompt, tergantung mode kuis
-        const textToSpeak = item.hanzi;
+        // Tombol suara
         const speakBtnHtml = `<button class="tab speak-btn-quiz" style="margin-left: 8px;" data-hanzi="${item.hanzi}">🔊</button>`;
 
+        // Tombol Again & Good
+        const againBtnHtml = `<button class="tab again-btn-quiz" style="margin-left: 8px;" data-id="${item.id}">Again</button>`;
+        const goodBtnHtml  = `<button class="tab good-btn-quiz" style="margin-left: 8px;" data-id="${item.id}">Good</button>`;
+
         if (item.chosen === correct) {
-            quizFeedback.innerHTML = "Benar! " + `<br>` + feedbackText + speakBtnHtml;
+            quizFeedback.innerHTML = "Benar! <br>" + feedbackText + speakBtnHtml + againBtnHtml + goodBtnHtml;
         } else {
-            quizFeedback.innerHTML = `Salah. Jawaban yang benar adalah: ${correct}` + `<br>` + feedbackText + speakBtnHtml;
+            quizFeedback.innerHTML = `Salah. Jawaban yang benar adalah: ${correct}<br>` + feedbackText + speakBtnHtml + againBtnHtml + goodBtnHtml;
         }
         nextQBtn.disabled = false;
     } else {
@@ -1837,11 +1839,44 @@ function showQuestionAt(index) {
         nextQBtn.disabled = true;
     }
 
+
     const quizSpeakBtn = document.querySelector('.speak-btn-quiz');
     if (quizSpeakBtn) { // Pastikan tombol ada sebelum menambahkan listener
         quizSpeakBtn.addEventListener('click', (e) => {
             const textToSpeak = e.currentTarget.dataset.hanzi;
             speak(textToSpeak); // Gunakan fungsi speak() yang sudah ada
+        });
+    }
+
+    // Event tombol Again di quiz feedback
+    const quizAgainBtn = document.querySelector('.again-btn-quiz');
+    if (quizAgainBtn) {
+        quizAgainBtn.addEventListener('click', (e) => {
+            const id = e.currentTarget.dataset.id;
+            const c = cards.find(cc => cc.id == id);
+            if (!c) return;
+            c.stats.again++;
+            c.status = 'again';
+            today.again++;
+            saveCards();
+            updateAccountOnStudy('again');
+            customAlert(`Kartu ${c.hanzi} / ${c.pinyin} / ${c.arti} ditandai "Again"`);
+        });
+    }
+
+    // Event tombol Good di quiz feedback
+    const quizGoodBtn = document.querySelector('.good-btn-quiz');
+    if (quizGoodBtn) {
+        quizGoodBtn.addEventListener('click', (e) => {
+            const id = e.currentTarget.dataset.id;
+            const c = cards.find(cc => cc.id == id);
+            if (!c) return;
+            c.stats.good++;
+            c.status = 'good';
+            today.good++;
+            saveCards();
+            updateAccountOnStudy('good');
+            customAlert(`Kartu ${c.hanzi} / ${c.pinyin} / ${c.arti} ditandai "Good"`);
         });
     }
 
