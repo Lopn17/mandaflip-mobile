@@ -1899,10 +1899,10 @@ function showQuestionAt(index) {
         const notyetBtnHtml  = `<button class="tab notyet-btn-quiz" style="margin-left: 8px;" data-id="${item.id}">Coba Lagi</button>`;
 
         if (item.chosen === correct) {
-            quizFeedback.innerHTML = "Benar! <br>" + feedbackText + speakBtnHtml + againBtnHtml + goodBtnHtml + notyetBtnHtml;
+            quizFeedback.innerHTML = "Benar! <br>" + feedbackText + "<br>" + againBtnHtml + goodBtnHtml + notyetBtnHtml + speakBtnHtml;
         } else {
-            quizFeedback.innerHTML = `Salah. Jawaban yang benar adalah: ${correct}<br>` + feedbackText + speakBtnHtml + againBtnHtml + goodBtnHtml + notyetBtnHtml;
-        }
+            quizFeedback.innerHTML = Salah. Jawaban yang benar adalah: ${correct}<br> + feedbackText + "<br>" + againBtnHtml + goodBtnHtml + notyetBtnHtml + speakBtnHtml;
+        }
         nextQBtn.disabled = false;
     } else {
         quizFeedback.textContent = '';
