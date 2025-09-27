@@ -1713,6 +1713,9 @@ $('#startQuizBtn').addEventListener('click', async () => {
     } else if (mode === 'arti-pinyin' || mode === 'hanzi-pinyin') {
         fieldToCheck = 'pinyin';
         fieldName = 'Pinyin';
+    } else {
+        fieldToCheck = 'arti';
+        fieldName = 'Arti';
     }
 
     if (fieldToCheck) {
