@@ -2311,8 +2311,19 @@ function attachListActionEvents() {
             if (!c) return;
             c.status = undefined;
             saveCards();
-            buildStudyOrder();
-            refreshStudyMeta();
+            if (currentFilter === 'all') {
+                next();
+            } else {
+                const oldId = c.id;
+                buildStudyOrder();
+                if (studyOrder.length > 0) {
+                    const newIndex = studyOrder.indexOf(oldId);
+                    if (newIndex !== -1) {
+                        studyIndex = newIndex;
+                    }
+                }
+                next();
+            }
             showNotification(`Status kartu ${c.hanzi} / ${c.pinyin} / ${c.arti} direset jadi "Belum Dicoba".`, "warning");
             renderList(); // refresh tampilan
         });
@@ -2753,9 +2764,19 @@ $('#notYetBtn').addEventListener('click', () => {
     // Reset status jadi belum dicoba
     c.status = undefined;
     saveCards(); 
-    buildStudyOrder();
-    refreshStudyMeta();
-
+    if (currentFilter === 'all') {
+        next();
+    } else {
+        const oldId = c.id;
+        buildStudyOrder();
+        if (studyOrder.length > 0) {
+            const newIndex = studyOrder.indexOf(oldId);
+            if (newIndex !== -1) {
+                studyIndex = newIndex;
+            }
+        }
+        next();
+    }
     // Feedback kecil (opsional)
     showNotification(`Status kartu ${c.hanzi} / ${c.pinyin} / ${c.arti} direset jadi "Belum Dicoba".`, "warning");
 });
